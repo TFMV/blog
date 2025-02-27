@@ -21,7 +21,7 @@ Every day, developers face this challenge:
 Quiver is what happens when vector search meets simplicity:
 
 - Blazing-fast HNSW for high-performance similarity search
-- DuckDB-style local-first indexing—no clusters, no complexity
+- DuckDB-style local-first indexing—fast hybrid search without clusters
 - SQL-like filtering alongside vector search
 - Low overhead—runs on your laptop, embedded in applications, or on-prem
 
@@ -212,3 +212,148 @@ Fast, flexible vector search—no clusters, no overhead.
 Whether you're running on a laptop, embedding in an app, or scaling in production, Quiver gives you vector search that just works.
 
 Ready to simplify vector search? [Check out Quiver on GitHub](https://github.com/TFMV/quiver).
+
+---
+
+## What's Under the Hood?
+
+Under the hood, Quiver combines HNSW-powered search with DuckDB-backed structured queries, wrapped in a production-ready Go API server and CLI. Here's how it all works together:
+
+### Production-Ready API Server
+
+Built with [Fiber](https://gofiber.io/)—the Express-inspired, lightning-fast web framework for Go. Quiver's API server delivers production-grade performance and reliability out of the box.
+
+#### 🛡️ Battle-Tested Reliability
+
+- Graceful shutdown with connection draining
+- Custom error handling with structured responses
+- Middleware-driven architecture for extensibility
+- Automatic panic recovery via Fiber middleware
+
+#### ⚡ Performance Optimized
+
+- Response compression via Fiber's compress middleware
+- Configurable idle, read, and write timeouts
+- Zero-allocation routing with Fiber's radix tree
+- Automatic response pooling
+
+#### 🔍 Observability Built-in
+
+- Structured logging with Uber's Zap logger
+- Built-in Fiber monitoring middleware
+- Kubernetes-ready health probes
+- Detailed request tracing
+
+#### 🎯 Developer Experience
+
+- Express-style middleware chain
+- Type-safe request handling
+- Content negotiation out of the box
+- Flexible configuration
+
+```go
+// Production middleware stack
+app := fiber.New(fiber.Config{
+    IdleTimeout:  10 * time.Second,
+    ReadTimeout:  10 * time.Second,
+    WriteTimeout: 10 * time.Second,
+})
+
+// Middleware chain
+app.Use(recover.New())     // Auto-recover from panics
+app.Use(compress.New())    // Gzip compression
+app.Use(monitor.New())     // Performance metrics
+app.Use(customLogger(log)) // Structured logging
+
+// Type-safe error handling
+func customErrorHandler(log *zap.Logger) fiber.ErrorHandler {
+    return func(c *fiber.Ctx, err error) error {
+        code := fiber.StatusInternalServerError
+        if e, ok := err.(*fiber.Error); ok {
+            code = e.Code
+        }
+        log.Error("Request failed", 
+            zap.String("path", c.Path()),
+            zap.Int("status", code),
+            zap.Error(err),
+        )
+        return c.Status(code).JSON(fiber.Map{
+            "error": true,
+            "message": err.Error(),
+        })
+    }
+}
+```
+
+### CLI
+
+Built with [Cobra](https://github.com/spf13/cobra) and [Viper](https://github.com/spf13/viper), Quiver's CLI provides a robust, production-grade command interface with features you'd expect from enterprise tools.
+
+#### 🎮 Command Structure
+
+```bash
+quiver
+├── serve     # Start the Quiver server
+├── status    # Check server health
+├── backup    # Backup index and metadata
+└── restore   # Restore from backup
+```
+
+#### ⚙️ Flexible Configuration
+
+- YAML configuration with sensible defaults
+- Environment variable support (`QUIVER_*`)
+- Command-line flag overrides
+- Automatic config discovery
+
+```yaml
+# config.yaml
+server:
+  port: 8080
+index:
+  dimension: 128
+  storage_path: "quiver.db"
+  max_elements: 100000
+  hnsw_m: 32
+  ef_construction: 200
+  ef_search: 200
+```
+
+#### 🛡️ Production Features
+
+- Graceful shutdown handling
+- Structured logging with Zap
+- Health check commands
+- Backup and restore capabilities
+
+```go
+// Production-grade server lifecycle
+ctx, stop := signal.NotifyContext(context.Background(), 
+    os.Interrupt, syscall.SIGTERM)
+defer stop()
+
+go func() {
+    <-ctx.Done()
+    logger.Info("Shutdown signal received")
+    if err := server.Shutdown(context.Background()); err != nil {
+        logger.Error("Server shutdown error", zap.Error(err))
+    }
+}()
+```
+
+#### 🔧 Smart Defaults
+
+- Automatic index configuration
+- Environment-aware settings
+- Intelligent error handling
+- Clear, actionable error messages
+
+Whether you're running in development or production, the CLI provides a consistent, reliable interface for managing your Quiver instance.
+
+### Core Implementation
+
+At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.
+
+#### 🔍 Vector Search Engine
+
+```
