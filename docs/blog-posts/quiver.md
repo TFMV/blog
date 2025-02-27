@@ -356,4 +356,76 @@ At its heart, Quiver combines blazing-fast HNSW indexing with structured metadat
 
 #### 🔍 Vector Search Engine
 
-```
+go
+type Index struct {
+    hnsw     *hnswgo.HnswIndex    // HNSW for vector search
+    metadata map[uint64]interface{} // Fast metadata access
+    db*sql.DB              // DuckDB for structured queries
+    cache    sync.Map             // High-performance metadata cache
+}
+
+- **HNSW Implementation**: Optimized C++ core with Go bindings
+- **Dual Distance Metrics**: Cosine similarity and L2 (Euclidean)
+- **Tunable Parameters**: M, efConstruction, efSearch for performance vs accuracy
+- **Memory-Mapped**: Efficient handling of large vector sets
+
+#### ⚡ Performance Optimizations
+
+- **Batch Processing**
+
+go
+  // Automatic batching for high-throughput ingestion
+  batchBuffer []vectorMeta
+  batchTicker *time.Ticker
+
+- Background vector batching
+- Configurable flush intervals
+- Automatic batch size tuning
+
+- **Smart Caching**
+  - Two-tier metadata caching
+  - In-memory fast path
+  - DuckDB persistent storage
+
+#### 🏹 Arrow Integration
+
+go
+// Native Arrow support for efficient data loading
+func (idx *Index) AppendFromArrow(rec arrow.Record) error {
+    // Direct zero-copy ingestion from Arrow
+    // Optimized batch processing
+    // Type-safe schema validation
+}
+
+#### 💾 Storage Engine
+
+- **DuckDB Backend**
+  - SQL-powered metadata filtering
+  - ACID transactions
+  - JSON metadata support
+  - Efficient hybrid search
+
+- **Persistence Layer**
+
+go
+  // Efficient save/load operations
+  func (idx *Index) Save(path string) error {
+      // Memory-mapped index persistence
+      // Atomic metadata updates
+      // Crash-safe operations
+  }
+
+#### 🛡️ Production Safeguards
+
+- **Resource Management**
+  - Graceful shutdown handling
+  - Connection pooling
+  - Memory-aware batching
+  - Automatic cleanup
+
+- **Type Safety**
+  - Strict dimension validation
+  - Schema enforcement
+  - Error handling with context
+
+Whether you're processing millions of vectors or running complex hybrid queries, Quiver's core is optimized for your workload—right on your machine.
