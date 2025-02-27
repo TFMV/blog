@@ -864,7 +864,85 @@ Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in pro
 <h3 id="core-implementation">Core Implementation<a class="headerlink" href="#core-implementation" title="Permanent link">#</a></h3>
 <p>At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.</p>
 <h4 id="vector-search-engine">🔍 Vector Search Engine<a class="headerlink" href="#vector-search-engine" title="Permanent link">#</a></h4>
-<p>```</p>
+<p>go<br />
+type Index struct {<br />
+    hnsw     <em>hnswgo.HnswIndex    // HNSW for vector search<br />
+    metadata map[uint64]interface{} // Fast metadata access<br />
+    db</em>sql.DB              // DuckDB for structured queries<br />
+    cache    sync.Map             // High-performance metadata cache<br />
+}</p>
+<ul>
+<li><strong>HNSW Implementation</strong>: Optimized C++ core with Go bindings</li>
+<li><strong>Dual Distance Metrics</strong>: Cosine similarity and L2 (Euclidean)</li>
+<li><strong>Tunable Parameters</strong>: M, efConstruction, efSearch for performance vs accuracy</li>
+<li><strong>Memory-Mapped</strong>: Efficient handling of large vector sets</li>
+</ul>
+<h4 id="performance-optimizations">⚡ Performance Optimizations<a class="headerlink" href="#performance-optimizations" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Batch Processing</strong></li>
+</ul>
+<p>go<br />
+  // Automatic batching for high-throughput ingestion<br />
+  batchBuffer []vectorMeta<br />
+  batchTicker *time.Ticker</p>
+<ul>
+<li>Background vector batching</li>
+<li>Configurable flush intervals</li>
+<li>
+<p>Automatic batch size tuning</p>
+</li>
+<li>
+<p><strong>Smart Caching</strong></p>
+</li>
+<li>Two-tier metadata caching</li>
+<li>In-memory fast path</li>
+<li>DuckDB persistent storage</li>
+</ul>
+<h4 id="arrow-integration">🏹 Arrow Integration<a class="headerlink" href="#arrow-integration" title="Permanent link">#</a></h4>
+<p>go<br />
+// Native Arrow support for efficient data loading<br />
+func (idx *Index) AppendFromArrow(rec arrow.Record) error {<br />
+    // Direct zero-copy ingestion from Arrow<br />
+    // Optimized batch processing<br />
+    // Type-safe schema validation<br />
+}</p>
+<h4 id="storage-engine">💾 Storage Engine<a class="headerlink" href="#storage-engine" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>DuckDB Backend</strong></li>
+<li>SQL-powered metadata filtering</li>
+<li>ACID transactions</li>
+<li>JSON metadata support</li>
+<li>
+<p>Efficient hybrid search</p>
+</li>
+<li>
+<p><strong>Persistence Layer</strong></p>
+</li>
+</ul>
+<p>go<br />
+  // Efficient save/load operations<br />
+  func (idx *Index) Save(path string) error {<br />
+      // Memory-mapped index persistence<br />
+      // Atomic metadata updates<br />
+      // Crash-safe operations<br />
+  }</p>
+<h4 id="production-safeguards">🛡️ Production Safeguards<a class="headerlink" href="#production-safeguards" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Resource Management</strong></li>
+<li>Graceful shutdown handling</li>
+<li>Connection pooling</li>
+<li>Memory-aware batching</li>
+<li>
+<p>Automatic cleanup</p>
+</li>
+<li>
+<p><strong>Type Safety</strong></p>
+</li>
+<li>Strict dimension validation</li>
+<li>Schema enforcement</li>
+<li>Error handling with context</li>
+</ul>
+<p>Whether you&rsquo;re processing millions of vectors or running complex hybrid queries, Quiver&rsquo;s core is optimized for your workload—right on your machine.</p>
 
 
 
