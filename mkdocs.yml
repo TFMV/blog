@@ -1,0 +1,74 @@
+site_name: "Blog - Thomas F McGeehan V"
+site_description: "Personal blog by Thomas F McGeehan V"
+site_author: "Thomas F McGeehan V"
+site_url: "https://tfmv.github.io/blog/"
+# Add your repo URL if you have one
+repo_url: "https://github.com/TFMV/blog"
+edit_uri: "blob/main/docs/"
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: pink
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Blog:
+      - Arrow Flight: blog-posts/flight.md
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - awesome-pages
+  - social:
+      cards_layout_options:
+        font_family: Roboto
+        background_color: "#303f9f"
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - smarty
+  - nl2br
+  - toc:
+      permalink: "#"
+      toc_depth: "1"
+  - tables
+  - admonition
+  - footnotes
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji
+  - pymdownx.tilde
+  - pymdownx.caret
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/TFMV"
+    - icon: fontawesome/brands/linkedin
+      link: "https://www.linkedin.com/in/TFMV"
+  analytics:
+    provider: google
