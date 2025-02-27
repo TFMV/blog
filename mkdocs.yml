@@ -34,6 +34,8 @@ nav:
   - Blog:
       - Arrow Flight: blog-posts/flight.md
       - Go and Arrow: blog-posts/go-arrow.md
+      - The Unilateral Bond: blog-posts/unilateral-bond.md
+
 plugins:
   - search
   - git-revision-date-localized

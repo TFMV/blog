@@ -1,5 +1,7 @@
 # When Go Meets Arrow: A Data Engineering Love Story?
 
+*Published on Feb 27, 2025*
+
 What happens when a concurrency champ like Go meets a columnar king like Arrow — synergy or stalemate? Right now? More of a sleeper hit than a showstopper — but the pieces are there. Apache Arrow and Go sit at a curious crossroads in modern data processing: one a language-agnostic powerhouse for in-memory analytics, the other a fast, concurrent workhorse reshaping data engineering. Go's traction in real-time pipelines is climbing, yet open-source projects leaning on Arrow-Go are few and far between. Meanwhile, Arrow's influence in analytics grows, with sharper performance and deeper Go integration in its latest releases. Let's unpack where these two stand, how Arrow-Go fits (or doesn't), and whether they're poised to converge or drift apart.
 
 ## Go's Growing Role in Data Engineering
