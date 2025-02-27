@@ -561,7 +561,7 @@ Something lightweight. Something fast. Something that just works.</p>
 <p>Quiver is what happens when vector search meets simplicity:</p>
 <ul>
 <li>Blazing-fast HNSW for high-performance similarity search</li>
-<li>DuckDB-style local-first indexing—no clusters, no complexity</li>
+<li>DuckDB-style local-first indexing—fast hybrid search without clusters</li>
 <li>SQL-like filtering alongside vector search</li>
 <li>Low overhead—runs on your laptop, embedded in applications, or on-prem</li>
 </ul>
@@ -741,6 +741,130 @@ quiver<span class="w"> </span>serve
 <p>Fast, flexible vector search—no clusters, no overhead.<br />
 Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in production, Quiver gives you vector search that just works.</p>
 <p>Ready to simplify vector search? <a href="https://github.com/TFMV/quiver">Check out Quiver on GitHub</a>.</p>
+<hr />
+<h2 id="whats-under-the-hood">What&rsquo;s Under the Hood?<a class="headerlink" href="#whats-under-the-hood" title="Permanent link">#</a></h2>
+<p>Under the hood, Quiver combines HNSW-powered search with DuckDB-backed structured queries, wrapped in a production-ready Go API server and CLI. Here&rsquo;s how it all works together:</p>
+<h3 id="production-ready-api-server">Production-Ready API Server<a class="headerlink" href="#production-ready-api-server" title="Permanent link">#</a></h3>
+<p>Built with <a href="https://gofiber.io/">Fiber</a>—the Express-inspired, lightning-fast web framework for Go. Quiver&rsquo;s API server delivers production-grade performance and reliability out of the box.</p>
+<h4 id="battle-tested-reliability">🛡️ Battle-Tested Reliability<a class="headerlink" href="#battle-tested-reliability" title="Permanent link">#</a></h4>
+<ul>
+<li>Graceful shutdown with connection draining</li>
+<li>Custom error handling with structured responses</li>
+<li>Middleware-driven architecture for extensibility</li>
+<li>Automatic panic recovery via Fiber middleware</li>
+</ul>
+<h4 id="performance-optimized">⚡ Performance Optimized<a class="headerlink" href="#performance-optimized" title="Permanent link">#</a></h4>
+<ul>
+<li>Response compression via Fiber&rsquo;s compress middleware</li>
+<li>Configurable idle, read, and write timeouts</li>
+<li>Zero-allocation routing with Fiber&rsquo;s radix tree</li>
+<li>Automatic response pooling</li>
+</ul>
+<h4 id="observability-built-in">🔍 Observability Built-in<a class="headerlink" href="#observability-built-in" title="Permanent link">#</a></h4>
+<ul>
+<li>Structured logging with Uber&rsquo;s Zap logger</li>
+<li>Built-in Fiber monitoring middleware</li>
+<li>Kubernetes-ready health probes</li>
+<li>Detailed request tracing</li>
+</ul>
+<h4 id="developer-experience">🎯 Developer Experience<a class="headerlink" href="#developer-experience" title="Permanent link">#</a></h4>
+<ul>
+<li>Express-style middleware chain</li>
+<li>Type-safe request handling</li>
+<li>Content negotiation out of the box</li>
+<li>Flexible configuration</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// Production middleware stack</span>
+<span class="nx">app</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span>
+<span class="w">    </span><span class="nx">IdleTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">ReadTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">WriteTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1">// Middleware chain</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">recover</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">     </span><span class="c1">// Auto-recover from panics</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">compress</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">    </span><span class="c1">// Gzip compression</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">monitor</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">     </span><span class="c1">// Performance metrics</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">customLogger</span><span class="p">(</span><span class="nx">log</span><span class="p">))</span><span class="w"> </span><span class="c1">// Structured logging</span>
+
+<span class="c1">// Type-safe error handling</span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">customErrorHandler</span><span class="p">(</span><span class="nx">log</span><span class="w"> </span><span class="o">*</span><span class="nx">zap</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">code</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">StatusInternalServerError</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="nx">e</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="o">*</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Error</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">code</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">Code</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="s">&quot;Request failed&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">String</span><span class="p">(</span><span class="s">&quot;path&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nx">Path</span><span class="p">()),</span>
+<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Int</span><span class="p">(</span><span class="s">&quot;status&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">code</span><span class="p">),</span>
+<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">),</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nx">Status</span><span class="p">(</span><span class="nx">code</span><span class="p">).</span><span class="nx">JSON</span><span class="p">(</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Map</span><span class="p">{</span>
+<span class="w">            </span><span class="s">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">Error</span><span class="p">(),</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">#</a></h3>
+<p>Built with <a href="https://github.com/spf13/cobra">Cobra</a> and <a href="https://github.com/spf13/viper">Viper</a>, Quiver&rsquo;s CLI provides a robust, production-grade command interface with features you&rsquo;d expect from enterprise tools.</p>
+<h4 id="command-structure">🎮 Command Structure<a class="headerlink" href="#command-structure" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code>quiver
+├──<span class="w"> </span>serve<span class="w">     </span><span class="c1"># Start the Quiver server</span>
+├──<span class="w"> </span>status<span class="w">    </span><span class="c1"># Check server health</span>
+├──<span class="w"> </span>backup<span class="w">    </span><span class="c1"># Backup index and metadata</span>
+└──<span class="w"> </span>restore<span class="w">   </span><span class="c1"># Restore from backup</span>
+</code></pre></div>
+<h4 id="flexible-configuration">⚙️ Flexible Configuration<a class="headerlink" href="#flexible-configuration" title="Permanent link">#</a></h4>
+<ul>
+<li>YAML configuration with sensible defaults</li>
+<li>Environment variable support (<code>QUIVER_*</code>)</li>
+<li>Command-line flag overrides</li>
+<li>Automatic config discovery</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># config.yaml</span>
+<span class="nt">server</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="nt">index</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">dimension</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
+<span class="w">  </span><span class="nt">storage_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;quiver.db&quot;</span>
+<span class="w">  </span><span class="nt">max_elements</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100000</span>
+<span class="w">  </span><span class="nt">hnsw_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+<span class="w">  </span><span class="nt">ef_construction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="w">  </span><span class="nt">ef_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+</code></pre></div>
+<h4 id="production-features">🛡️ Production Features<a class="headerlink" href="#production-features" title="Permanent link">#</a></h4>
+<ul>
+<li>Graceful shutdown handling</li>
+<li>Structured logging with Zap</li>
+<li>Health check commands</li>
+<li>Backup and restore capabilities</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// Production-grade server lifecycle</span>
+<span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">signal</span><span class="p">.</span><span class="nx">NotifyContext</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">(),</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">os</span><span class="p">.</span><span class="nx">Interrupt</span><span class="p">,</span><span class="w"> </span><span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGTERM</span><span class="p">)</span>
+<span class="k">defer</span><span class="w"> </span><span class="nx">stop</span><span class="p">()</span>
+
+<span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+<span class="w">    </span><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">(</span><span class="s">&quot;Shutdown signal received&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">server</span><span class="p">.</span><span class="nx">Shutdown</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">());</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">logger</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="s">&quot;Server shutdown error&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}()</span>
+</code></pre></div>
+<h4 id="smart-defaults">🔧 Smart Defaults<a class="headerlink" href="#smart-defaults" title="Permanent link">#</a></h4>
+<ul>
+<li>Automatic index configuration</li>
+<li>Environment-aware settings</li>
+<li>Intelligent error handling</li>
+<li>Clear, actionable error messages</li>
+</ul>
+<p>Whether you&rsquo;re running in development or production, the CLI provides a consistent, reliable interface for managing your Quiver instance.</p>
+<h3 id="core-implementation">Core Implementation<a class="headerlink" href="#core-implementation" title="Permanent link">#</a></h3>
+<p>At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.</p>
+<h4 id="vector-search-engine">🔍 Vector Search Engine<a class="headerlink" href="#vector-search-engine" title="Permanent link">#</a></h4>
+<p>```</p>
 
 
 
