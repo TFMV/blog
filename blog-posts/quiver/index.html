@@ -12,13 +12,11 @@
         <meta name="author" content="Thomas F McGeehan V">
       
       
-        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/go-arrow/">
+        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/quiver/">
       
       
-        <link rel="prev" href="../flight/">
+        <link rel="prev" href="../unilateral-bond/">
       
-      
-        <link rel="next" href="../unilateral-bond/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +24,7 @@
     
     
       
-        <title>Go and Arrow - Blog - Thomas F McGeehan V</title>
+        <title>Quiver - Blog - Thomas F McGeehan V</title>
       
     
     
@@ -71,11 +69,11 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Go and Arrow - Blog - Thomas F McGeehan V" >
+        <meta  property="og:title"  content="Quiver - Blog - Thomas F McGeehan V" >
       
         <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/go-arrow.png" >
+        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/quiver.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -83,15 +81,15 @@
       
         <meta  property="og:image:height"  content="630" >
       
-        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/go-arrow/" >
+        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/quiver/" >
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Go and Arrow - Blog - Thomas F McGeehan V" >
+        <meta  name="twitter:title"  content="Quiver - Blog - Thomas F McGeehan V" >
       
         <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/go-arrow.png" >
+        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/quiver.png" >
       
     
     
@@ -114,7 +112,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#when-go-meets-arrow-a-data-engineering-love-story" class="md-skip">
+        <a href="#quiver" class="md-skip">
           Skip to content
         </a>
       
@@ -148,7 +146,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Go and Arrow
+              Quiver
             
           </span>
         </div>
@@ -434,19 +432,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../go-arrow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -455,7 +444,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -486,10 +474,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../quiver/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -498,6 +495,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -546,121 +544,203 @@
   
 
 
-<h1 id="when-go-meets-arrow-a-data-engineering-love-story">When Go Meets Arrow: A Data Engineering Love Story?<a class="headerlink" href="#when-go-meets-arrow-a-data-engineering-love-story" title="Permanent link">#</a></h1>
-<p><em>Published on Feb 27, 2025</em></p>
-<p>What happens when a concurrency champ like Go meets a columnar king like Arrow — synergy or stalemate? Right now? More of a sleeper hit than a showstopper — but the pieces are there. Apache Arrow and Go sit at a curious crossroads in modern data processing: one a language-agnostic powerhouse for in-memory analytics, the other a fast, concurrent workhorse reshaping data engineering. Go&rsquo;s traction in real-time pipelines is climbing, yet open-source projects leaning on Arrow-Go are few and far between. Meanwhile, Arrow&rsquo;s influence in analytics grows, with sharper performance and deeper Go integration in its latest releases. Let&rsquo;s unpack where these two stand, how Arrow-Go fits (or doesn&rsquo;t), and whether they&rsquo;re poised to converge or drift apart.</p>
-<h2 id="gos-growing-role-in-data-engineering">Go&rsquo;s Growing Role in Data Engineering<a class="headerlink" href="#gos-growing-role-in-data-engineering" title="Permanent link">#</a></h2>
-<p>Go (or Golang), birthed at Google and open-sourced in 2009, compiles to native code, outpacing interpreted languages like Python. Its syntax is lean, its concurrency (goroutines, channels) is a breeze compared to thread-heavy alternatives, and its static binaries, though chunky, deploy without fuss. The Go Gopher? A cute mascot for a language that&rsquo;s all about getting shit done, fast.</p>
-<p>In data engineering, Go&rsquo;s shining in real-time pipelines — think parsing 100k events per second where Python chokes on memory overhead or Logstash hogs resources (see Medium&rsquo;s take on Go for data engineering).</p>
-<h2 id="recent-advancements-in-go-for-data-engineering">Recent Advancements in Go for Data Engineering<a class="headerlink" href="#recent-advancements-in-go-for-data-engineering" title="Permanent link">#</a></h2>
-<p>Go keeps sharpening its edge for data workloads. Go 1.24 introduces performance and memory improvements that align well with Apache Arrow-Go&rsquo;s compute-heavy tasks.</p>
-<p>🔹 Smarter CPU Utilization: Profile-Guided Optimization (PGO), introduced in Go 1.22, can squeeze out 2–7% better CPU performance, a crucial boost for Arrow-Go&rsquo;s columnar transformations.</p>
-<p>🔹 Generics for Cleaner Data Structures: Since Go 1.18, generics have made it easier to build type-safe, flexible data structures — helpful for Arrow array builders that previously relied on clunky interfaces.</p>
-<p>🔹 Lower Contention in Concurrent Workloads: sync.Map tweaks across recent releases have cut contention in concurrent metadata caching — a win for Arrow-Go pipelines juggling shared state.</p>
-<p>🔹 Leaner Text Parsing for Arrow Ingestion: Community chatter hints at faster text streaming, with new iterator functions (Lines, SplitSeq) reducing overhead when converting CSV/JSON into Arrow arrays.</p>
-<h2 id="the-unseen-backbone-of-high-performance-analytics">The Unseen Backbone of High-Performance Analytics<a class="headerlink" href="#the-unseen-backbone-of-high-performance-analytics" title="Permanent link">#</a></h2>
-<p>Apache Arrow is a columnar memory standard that kills inefficiencies in row-based processing. Zero-copy data sharing? Check. Vectorized execution for analytics and ML? Yup. Cross-language glue for C++, Python, Rust, Java, and Go? Absolutely. It&rsquo;s the quiet engine in tools like Spark, Dremio, DuckDB, and Polars — even creeping into ML frameworks like TensorFlow. Go&rsquo;s role in this party? Still figuring out its dance moves.</p>
-<h2 id="how-traditional-data-structures-differ-from-apache-arrow">How Traditional Data Structures Differ from Apache Arrow<a class="headerlink" href="#how-traditional-data-structures-differ-from-apache-arrow" title="Permanent link">#</a></h2>
-<h3 id="1-row-based-vs-columnar-storage">1. Row-Based vs. Columnar Storage<a class="headerlink" href="#1-row-based-vs-columnar-storage" title="Permanent link">#</a></h3>
-<p>Let&rsquo;s look at how the same data is stored in both formats:</p>
-<h4 id="row-based-storage">Row-Based Storage<a class="headerlink" href="#row-based-storage" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code>┌────────────────────────────────────┐
-│ ID: 1  │ Name: Alice  │ Age: 25    │
-│ ID: 2  │ Name: Bob    │ Age: 30    │
-│ ID: 3  │ Name: Carol  │ Age: 22    │
-│ ID: 4  │ Name: Dave   │ Age: 27    │
-└────────────────────────────────────┘
-</code></pre></div>
-<p><strong>Pros &amp; Cons:</strong><br />
-✅ Perfect for grabbing a single user&rsquo;s complete record<br />
-❌ Not great for analytics (like finding average age)</p>
-<h4 id="columnar-storage-apache-arrow">Columnar Storage (Apache Arrow)<a class="headerlink" href="#columnar-storage-apache-arrow" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code>┌─ ID ──┐    ┌─ Name ─┐    ┌─ Age ─┐
-│   1   │    │ Alice  │    │  25   │
-│   2   │    │ Bob    │    │  30   │
-│   3   │    │ Carol  │    │  22   │
-│   4   │    │ Dave   │    │  27   │
-└───────┘    └────────┘    └───────┘
-</code></pre></div>
-<p><strong>Pros &amp; Cons:</strong><br />
-✅ Blazing fast for analytics (just grab the Age column)<br />
-✅ CPU-friendly (SIMD operations on continuous memory)</p>
-<h3 id="2-why-columnar-storage-is-faster-for-analytics">2. Why Columnar Storage is Faster for Analytics<a class="headerlink" href="#2-why-columnar-storage-is-faster-for-analytics" title="Permanent link">#</a></h3>
-<p>Imagine querying the average age of all users.</p>
-<p>Row-Based Storage: The database reads every row, parsing unnecessary fields like ID and Name, leading to cache inefficiency.<br />
-Columnar Storage: Only the Age column is read, enabling faster, parallelized execution using vectorized processing.</p>
-<p>This is why Arrow&rsquo;s columnar format is widely used in modern analytics — it allows for:<br />
-✅ Zero-copy sharing between systems (no serialization overhead)<br />
-✅ Parallel query execution (SIMD, CPU cache locality)<br />
-✅ Optimized memory access for large-scale data analytics</p>
-<h3 id="3-arrows-in-memory-format-zero-copy-data-access">3. Arrow&rsquo;s In-Memory Format: Zero-Copy Data Access<a class="headerlink" href="#3-arrows-in-memory-format-zero-copy-data-access" title="Permanent link">#</a></h3>
-<p>Traditional systems serialize data when transferring between applications (e.g., converting a Pandas DataFrame into a JSON payload). This slows down performance due to encoding/decoding overhead.</p>
-<p>Apache Arrow eliminates this with a standard in-memory format, enabling zero-copy reads across systems. This means data can be shared across Python, Go, Rust, and Java without any serialization/deserialization overhead.</p>
-<p>Example Use Cases:<br />
-🔹 Pandas → Go: A Python ML model can generate a dataset and pass it directly to a Go-based API using Arrow IPC — no need for JSON or CSV conversion.<br />
-🔹 Query Engines (Dremio, DuckDB): Many modern databases use Arrow internally for high-performance, vectorized query execution.</p>
-<h2 id="arrow-go-is-it-underrated-or-just-underused">Arrow-Go: Is It Underrated or Just Underused?<a class="headerlink" href="#arrow-go-is-it-underrated-or-just-underused" title="Permanent link">#</a></h2>
-<p>The stars are finally aligning for Arrow-Go. Apache Arrow 18.0.0 was the breakthrough: breaking free from the monorepo unleashed faster updates, expanded compute functions, and tighter Parquet integration. But the real game-changer? The c2goasm optimizations that finally let Arrow-Go flex its performance muscle.</p>
-<p>Why now? Two forces are converging:</p>
-<ol>
-<li>Arrow-Go&rsquo;s hitting its stride with battle-tested stability and near-native performance</li>
-<li>Go&rsquo;s exploding in real-time data processing where Arrow shines brightest</li>
-</ol>
-<p>Yet in the open-source world, Arrow-Go&rsquo;s still the wallflower at the data engineering dance. Rust powers DataFusion&rsquo;s query engine and Polars&rsquo; backend, Python leans on Arrow for Pandas, but Go? It mostly sticks to C++ bindings over its own Arrow-Go implementation.</p>
-<p>Why? Memory friction.</p>
-<h3 id="memory-management-in-arrow-go">Memory Management in Arrow-Go<a class="headerlink" href="#memory-management-in-arrow-go" title="Permanent link">#</a></h3>
-<p>Here&rsquo;s a simple example showing how we handle memory in Arrow-Go:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Create a new builder for int64 values</span>
-<span class="nx">bldr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">array</span><span class="p">.</span><span class="nx">NewInt64Builder</span><span class="p">(</span><span class="nx">memory</span><span class="p">.</span><span class="nx">DefaultAllocator</span><span class="p">)</span>
-<span class="k">defer</span><span class="w"> </span><span class="nx">bldr</span><span class="p">.</span><span class="nx">Release</span><span class="p">()</span><span class="w">  </span><span class="c1">// 👈 Don&#39;t forget to release!</span>
-
-<span class="c1">// Add some numbers</span>
-<span class="nx">bldr</span><span class="p">.</span><span class="nx">AppendValues</span><span class="p">([]</span><span class="kt">int64</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
-
-<span class="c1">// Build the array (also needs releasing)</span>
-<span class="nx">arr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bldr</span><span class="p">.</span><span class="nx">NewInt64Array</span><span class="p">()</span>
-<span class="k">defer</span><span class="w"> </span><span class="nx">arr</span><span class="p">.</span><span class="nx">Release</span><span class="p">()</span><span class="w">  </span><span class="c1">// 👈 Memory cleanup is manual</span>
-
-<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span><span class="w">  </span><span class="c1">// [1 2 3]</span>
-</code></pre></div>
-<p>While this manual memory management adds friction, it also allows fine-grained control over performance, which can be a huge advantage in high-throughput, memory-sensitive workloads.</p>
-<p>Underrated? Maybe. Underused? Definitely.</p>
-<h2 id="wheres-arrow-go-actually-being-used-not-many-places">Where&rsquo;s Arrow-Go Actually Being Used? (Not Many Places)<a class="headerlink" href="#wheres-arrow-go-actually-being-used-not-many-places" title="Permanent link">#</a></h2>
-<p>Arrow-Go&rsquo;s footprint in open source is thin. It&rsquo;s alive in Apache Arrow&rsquo;s core (GitHub: apache/arrow-go), but beyond testing, it&rsquo;s mostly silent.</p>
-<p>InfluxDB chipped in contributions, yet still leans on C++ for the heavy lifting (InfluxData blog). Dremio and UKV ride Arrow&rsquo;s wave, just not in Go.</p>
-<p>One standout? Voltron Data, which touts Arrow-Go for efficient data pipelines (Voltron Data blog).</p>
-<p>But here&rsquo;s the kicker: there&rsquo;s no Go-native equivalent of Pandas or Polars. Not even close. A few GitHub repos are taking early shots (arrow-dataframe-go, go-polars), but this space is WIDE open. If you&rsquo;re building data tools in Go, this isn&rsquo;t just an opportunity—it&rsquo;s a frontier waiting for its pioneer.</p>
-<h2 id="where-go-and-arrow-could-and-should-converge">Where Go and Arrow Could (and Should) Converge<a class="headerlink" href="#where-go-and-arrow-could-and-should-converge" title="Permanent link">#</a></h2>
-<p>Three game-changing opportunities where Go + Arrow could shine:</p>
-<h3 id="real-time-analytics">🚀 Real-Time Analytics<a class="headerlink" href="#real-time-analytics" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Goroutines + Arrow&rsquo;s Flight RPC<br />
-<strong>The Magic:</strong> Think sub-millisecond data transfers that would make your DBA weep with joy. We&rsquo;re talking:</p>
+<h1 id="quiver">Quiver<a class="headerlink" href="#quiver" title="Permanent link">#</a></h1>
+<p>A local-first vector database combining structured queries with high-speed similarity search—without the complexity of distributed systems.</p>
+<h2 id="the-vector-search-problem">The Vector Search Problem<a class="headerlink" href="#the-vector-search-problem" title="Permanent link">#</a></h2>
+<p>Picture this: You&rsquo;ve built an amazing AI application that needs vector search. The usual choices? Heavyweight vector databases that demand a fleet of machines—or barebones libraries that can&rsquo;t handle metadata, filtering, or hybrid queries.</p>
+<p>Why is there no SQLite for vector search?<br />
+Something lightweight. Something fast. Something that just works.</p>
+<p>Every day, developers face this challenge:</p>
 <ul>
-<li>Lightning-fast IoT sensor processing</li>
-<li>High-frequency trading systems that actually keep up</li>
-<li>Real-time fraud detection that catches things before they happen</li>
+<li>Heavyweight databases designed for clusters you don&rsquo;t need</li>
+<li>Basic libraries that can&rsquo;t handle structured data alongside vectors</li>
+<li>The choice between power and simplicity</li>
+<li>Infrastructure complexity that gets in the way of building</li>
 </ul>
-<h3 id="edge-computing">🌍 Edge Computing<a class="headerlink" href="#edge-computing" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Go&rsquo;s tiny footprint × Arrow-Go&rsquo;s memory efficiency<br />
-<strong>The Magic:</strong> Edge nodes that punch above their weight:</p>
+<h2 id="quiver-vector-search-meets-simplicity">Quiver: Vector Search Meets Simplicity<a class="headerlink" href="#quiver-vector-search-meets-simplicity" title="Permanent link">#</a></h2>
+<p>Quiver is what happens when vector search meets simplicity:</p>
 <ul>
-<li>Crunch complex analytics on Raspberry Pis</li>
-<li>Process satellite data right where it lands</li>
-<li>Turn resource constraints from limiting to liberating</li>
+<li>Blazing-fast HNSW for high-performance similarity search</li>
+<li>DuckDB-style local-first indexing—no clusters, no complexity</li>
+<li>SQL-like filtering alongside vector search</li>
+<li>Low overhead—runs on your laptop, embedded in applications, or on-prem</li>
 </ul>
-<h3 id="data-interchange">🔄 Data Interchange<a class="headerlink" href="#data-interchange" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Zero-copy bridge between ecosystems<br />
-<strong>The Magic:</strong> The dream of seamless data flow:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get started in two commands</span>
+go<span class="w"> </span>get<span class="w"> </span>github.com/TFMV/quiver
+quiver<span class="w"> </span>serve
+</code></pre></div>
+<h2 id="why-quiver-the-speed-you-need-the-simplicity-you-want">Why Quiver? The Speed You Need, The Simplicity You Want<a class="headerlink" href="#why-quiver-the-speed-you-need-the-simplicity-you-want" title="Permanent link">#</a></h2>
+<h3 id="lightning-fast-local-search">🚀 Lightning-Fast Local Search<a class="headerlink" href="#lightning-fast-local-search" title="Permanent link">#</a></h3>
+<p>Quiver&rsquo;s HNSW implementation isn&rsquo;t just fast—it&rsquo;s optimized for single-node performance:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find similar vectors in microseconds, right on your machine</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Search</span><span class="p">(</span><span class="nx">queryVector</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="hybrid-search-that-just-works">🎯 Hybrid Search That Just Works<a class="headerlink" href="#hybrid-search-that-just-works" title="Permanent link">#</a></h3>
+<p>Combine vector similarity with structured filters, all processed locally:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find similar science articles from last week</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">queryVector</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">10</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;category = &#39;science&#39; AND date &gt; &#39;2024-03-10&#39;&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="smart-local-processing">📦 Smart Local Processing<a class="headerlink" href="#smart-local-processing" title="Permanent link">#</a></h3>
+<p>Optimized for your machine&rsquo;s resources:</p>
 <ul>
-<li>ML models in Python? ➡️ Go services? No sweat</li>
-<li>Streaming analytics without the serialization tax</li>
-<li>Cross-language pipelines that just work</li>
+<li>Efficient memory management</li>
+<li>Local metadata caching</li>
+<li>Background processing that respects your CPU</li>
 </ul>
-<hr />
-<p>Go&rsquo;s charging into data engineering with speed and simplicity, Arrow&rsquo;s rewriting analytics from the memory up, and Arrow-Go? A sleeper hit waiting for its moment.</p>
-<p>Real-time, edge, data interchange — the pieces fit, but open-source hasn&rsquo;t fully bitten. Is it Go&rsquo;s young data ecosystem holding it back, or just a visibility glitch?</p>
-<p>Arrow-Go isn&rsquo;t missing features—it&rsquo;s missing champions. The foundation is solid, the timing is right, and the opportunity is massive.</p>
-<p>Time to stop waiting and start building. Your move, gophers.</p>
+<h3 id="local-batch-processing-with-arrow">🏹 Local Batch Processing with Arrow<a class="headerlink" href="#local-batch-processing-with-arrow" title="Permanent link">#</a></h3>
+<p>Native support for Apache Arrow means efficient local data handling:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Batch process vectors locally with Arrow</span>
+<span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">AppendFromArrow</span><span class="p">(</span><span class="nx">record</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="show-me-the-numbers">Show Me The Numbers<a class="headerlink" href="#show-me-the-numbers" title="Permanent link">#</a></h2>
+<p>How fast is Quiver?</p>
+<ul>
+<li>28,800 vector searches per second</li>
+<li>Hybrid search in &lt;0.5ms</li>
+<li>Batch processing at 10M+ vectors/sec</li>
+</ul>
+<p>Here are our benchmarks running on a standard 8-core laptop with 1M 128-dimensional vectors:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Throughput</th>
+<th>Latency</th>
+<th>Memory/Op</th>
+<th>Allocs/Op</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Search</td>
+<td>28.8K ops/sec</td>
+<td>41µs</td>
+<td>1.5 KB</td>
+<td>18</td>
+</tr>
+<tr>
+<td>Hybrid Search</td>
+<td>2.5K ops/sec</td>
+<td>432µs</td>
+<td>7.5 KB</td>
+<td>278</td>
+</tr>
+<tr>
+<td>Add</td>
+<td>5.5K ops/sec</td>
+<td>3.2ms</td>
+<td>1.4 KB</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Add Parallel</td>
+<td>4.5K ops/sec</td>
+<td>5.3ms</td>
+<td>1.3 KB</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Arrow Append*</td>
+<td>100 ops/sec</td>
+<td>2.7s</td>
+<td>2.3 MB</td>
+<td>32,332</td>
+</tr>
+</tbody>
+</table>
+<h3 id="batch-ingestion-that-scales-without-clusters">Batch Ingestion That Scales Without Clusters<a class="headerlink" href="#batch-ingestion-that-scales-without-clusters" title="Permanent link">#</a></h3>
+<ul>
+<li>Append 100,000 vectors per operation with Arrow</li>
+<li>Optimized for local-first AI workloads, no distributed infrastructure required</li>
+<li>High throughput: 10M+ records/sec for structured metadata + vectors</li>
+</ul>
+<p>What these numbers mean in practice:</p>
+<ul>
+<li><strong>Fast local queries</strong>: 41µs latency on a single machine</li>
+<li><strong>Efficient memory use</strong>: Most operations need just 1.5KB of memory</li>
+<li><strong>Smart resource use</strong>: Parallel operations optimize your machine&rsquo;s capabilities</li>
+<li><strong>Local batch processing</strong>: Efficient data loading with Arrow</li>
+</ul>
+<h2 id="where-quiver-shines">Where Quiver Shines<a class="headerlink" href="#where-quiver-shines" title="Permanent link">#</a></h2>
+<h3 id="semantic-document-search">📚 Semantic Document Search<a class="headerlink" href="#semantic-document-search" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Index a document with rich metadata</span>
+<span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="nx">docID</span><span class="p">,</span><span class="w"> </span><span class="nx">embedding</span><span class="p">,</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span>
+<span class="w">    </span><span class="s">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Understanding Vector Search&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jane Doe&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;AI&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;databases&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="s">&quot;readingTime&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+<span class="p">})</span>
+</code></pre></div>
+<h3 id="smart-recommendations">🎯 Smart Recommendations<a class="headerlink" href="#smart-recommendations" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find similar products within price range</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">userPreferences</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">5</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;price BETWEEN 10 AND 50&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="visual-search">🖼️ Visual Search<a class="headerlink" href="#visual-search" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find similar images with specific attributes</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">imageEmbedding</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">10</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;resolution = &#39;HD&#39; AND style = &#39;minimalist&#39;&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="rag-applications">🤖 RAG Applications<a class="headerlink" href="#rag-applications" title="Permanent link">#</a></h3>
+<p>Perfect for Retrieval-Augmented Generation:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find relevant context for LLM</span>
+<span class="nx">context</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">queryEmbedding</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;confidence &gt; 0.8&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="getting-started-two-minute-setup">Getting Started: Two-Minute Setup<a class="headerlink" href="#getting-started-two-minute-setup" title="Permanent link">#</a></h2>
+<h3 id="1-installation">1. Installation<a class="headerlink" href="#1-installation" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/TFMV/quiver
+</code></pre></div>
+<h3 id="2-initialize-your-index">2. Initialize Your Index<a class="headerlink" href="#2-initialize-your-index" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nx">index</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">quiver</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">quiver</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span>
+<span class="w">    </span><span class="nx">Dimension</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">StoragePath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vectors.db&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">MaxElements</span><span class="p">:</span><span class="w"> </span><span class="mi">100000</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+<h3 id="3-start-searching">3. Start Searching<a class="headerlink" href="#3-start-searching" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Add vectors with metadata</span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">vectorData</span><span class="p">,</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span>
+<span class="w">    </span><span class="s">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;science&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jane Doe&quot;</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1">// Search with type safety</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Search</span><span class="p">(</span><span class="nx">queryVector</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="rest-api-language-agnostic-integration">REST API: Language-Agnostic Integration<a class="headerlink" href="#rest-api-language-agnostic-integration" title="Permanent link">#</a></h2>
+<p>No Go? No problem. Quiver speaks HTTP:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/search/hybrid<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;vector&quot;: [0.1, 0.2, ...],</span>
+<span class="s1">    &quot;k&quot;: 5,</span>
+<span class="s1">    &quot;filter&quot;: &quot;category = &#39;</span>science<span class="s1">&#39;&quot;</span>
+<span class="s1">  }&#39;</span>
+</code></pre></div>
+<h2 id="why-choose-quiver">Why Choose Quiver?<a class="headerlink" href="#why-choose-quiver" title="Permanent link">#</a></h2>
+<p>🚀 <strong>Zero setup</strong>—install &amp; search in minutes<br />
+⚡ <strong>Blazing-fast</strong>—sub-millisecond queries, even on a laptop<br />
+🛠️ <strong>Developer-friendly</strong>—Go SDK &amp; REST API<br />
+💡 <strong>No cloud lock-in</strong>—runs anywhere, no clusters required</p>
+<h2 id="whats-next">What&rsquo;s Next?<a class="headerlink" href="#whats-next" title="Permanent link">#</a></h2>
+<p>Your AI. Your Data. Your Machine.</p>
+<p>Fast, flexible vector search—no clusters, no overhead.<br />
+Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in production, Quiver gives you vector search that just works.</p>
+<p>Ready to simplify vector search? <a href="https://github.com/TFMV/quiver">Check out Quiver on GitHub</a>.</p>
 
 
 
