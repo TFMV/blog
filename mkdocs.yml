@@ -2,7 +2,6 @@ site_name: "Blog - Thomas F McGeehan V"
 site_description: "Personal blog by Thomas F McGeehan V"
 site_author: "Thomas F McGeehan V"
 site_url: "https://tfmv.github.io/blog/"
-# Add your repo URL if you have one
 repo_url: "https://github.com/TFMV/blog"
 edit_uri: "blob/main/docs/"
 
@@ -34,7 +33,7 @@ nav:
   - Home: index.md
   - Blog:
       - Arrow Flight: blog-posts/flight.md
-
+      - Go and Arrow: blog-posts/go-arrow.md
 plugins:
   - search
   - git-revision-date-localized
