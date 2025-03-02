@@ -618,9 +618,11 @@
 <ul>
 <li>A 64-bit length (5) and a null count.  </li>
 <li>A validity bitmap (e.g., <code>1 0 1 1 1</code> for values <code>[1, NA, 2, 4, 8]</code>).  </li>
-<li>A corresponding data buffer with values (with <code>NA</code> represented appropriately).  </li>
+<li>A corresponding data buffer with values (with <code>NA</code> represented appropriately).</li>
 </ul>
-<p>This layout is illustrated by a diagram where metadata (gray) stores length and null count, and two buffers (dotted boxes) hold the bitmap and data. Each value is accessed in <strong>O(1) time</strong> via pointer offset arithmetic.</p>
+<hr />
+<p>This layout is illustrated by the below diagram where metadata (gray) stores length and null count, and two buffers (dotted boxes) hold the bitmap and data. Each value is accessed in <strong>O(1) time</strong> via pointer offset arithmetic.</p>
+<p><img alt="arrow" src="../../art/arrow-ecosystem-figure1.png" /></p>
 <ul>
 <li><strong>Memory Alignment:</strong><br />
   Arrow pads and aligns buffers to <strong>8-byte boundaries</strong> (and ideally to <strong>64-byte cache-line boundaries</strong>) to enhance <strong>sequential scanning</strong> and facilitate <strong>SIMD (Single Instruction, Multiple Data) processing</strong>.</li>
