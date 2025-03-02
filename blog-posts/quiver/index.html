@@ -18,6 +18,8 @@
         <link rel="prev" href="../unilateral-bond/">
       
       
+        <link rel="next" href="../billion/">
+      
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
@@ -373,6 +375,8 @@
       
         
       
+        
+      
     
     
       
@@ -496,6 +500,27 @@
 
       </a>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../billion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Billion
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -864,13 +889,13 @@ Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in pro
 <h3 id="core-implementation">Core Implementation<a class="headerlink" href="#core-implementation" title="Permanent link">#</a></h3>
 <p>At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.</p>
 <h4 id="vector-search-engine">🔍 Vector Search Engine<a class="headerlink" href="#vector-search-engine" title="Permanent link">#</a></h4>
-<p>go<br />
-type Index struct {<br />
-    hnsw     <em>hnswgo.HnswIndex    // HNSW for vector search<br />
-    metadata map[uint64]interface{} // Fast metadata access<br />
-    db</em>sql.DB              // DuckDB for structured queries<br />
-    cache    sync.Map             // High-performance metadata cache<br />
-}</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">Index</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">hnsw</span><span class="w">     </span><span class="o">*</span><span class="nx">hnswgo</span><span class="p">.</span><span class="nx">HnswIndex</span><span class="w">    </span><span class="c1">// HNSW for vector search</span>
+<span class="w">    </span><span class="nx">metadata</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span><span class="w"> </span><span class="c1">// Fast metadata access</span>
+<span class="w">    </span><span class="nx">db</span><span class="o">*</span><span class="nx">sql</span><span class="p">.</span><span class="nx">DB</span><span class="w">              </span><span class="c1">// DuckDB for structured queries</span>
+<span class="w">    </span><span class="nx">cache</span><span class="w">    </span><span class="nx">sync</span><span class="p">.</span><span class="nx">Map</span><span class="w">             </span><span class="c1">// High-performance metadata cache</span>
+<span class="p">}</span>
+</code></pre></div>
 <ul>
 <li><strong>HNSW Implementation</strong>: Optimized C++ core with Go bindings</li>
 <li><strong>Dual Distance Metrics</strong>: Cosine similarity and L2 (Euclidean)</li>
@@ -881,10 +906,10 @@ type Index struct {<br />
 <ul>
 <li><strong>Batch Processing</strong></li>
 </ul>
-<p>go<br />
-  // Automatic batching for high-throughput ingestion<br />
-  batchBuffer []vectorMeta<br />
-  batchTicker *time.Ticker</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// Automatic batching for high-throughput ingestion</span>
+<span class="w">  </span><span class="nx">batchBuffer</span><span class="w"> </span><span class="p">[]</span><span class="nx">vectorMeta</span>
+<span class="w">  </span><span class="nx">batchTicker</span><span class="w"> </span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Ticker</span>
+</code></pre></div>
 <ul>
 <li>Background vector batching</li>
 <li>Configurable flush intervals</li>
@@ -899,13 +924,13 @@ type Index struct {<br />
 <li>DuckDB persistent storage</li>
 </ul>
 <h4 id="arrow-integration">🏹 Arrow Integration<a class="headerlink" href="#arrow-integration" title="Permanent link">#</a></h4>
-<p>go<br />
-// Native Arrow support for efficient data loading<br />
-func (idx *Index) AppendFromArrow(rec arrow.Record) error {<br />
-    // Direct zero-copy ingestion from Arrow<br />
-    // Optimized batch processing<br />
-    // Type-safe schema validation<br />
-}</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Native Arrow support for efficient data loading</span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">AppendFromArrow</span><span class="p">(</span><span class="nx">rec</span><span class="w"> </span><span class="nx">arrow</span><span class="p">.</span><span class="nx">Record</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Direct zero-copy ingestion from Arrow</span>
+<span class="w">    </span><span class="c1">// Optimized batch processing</span>
+<span class="w">    </span><span class="c1">// Type-safe schema validation</span>
+<span class="p">}</span>
+</code></pre></div>
 <h4 id="storage-engine">💾 Storage Engine<a class="headerlink" href="#storage-engine" title="Permanent link">#</a></h4>
 <ul>
 <li><strong>DuckDB Backend</strong></li>
@@ -919,13 +944,13 @@ func (idx *Index) AppendFromArrow(rec arrow.Record) error {<br />
 <p><strong>Persistence Layer</strong></p>
 </li>
 </ul>
-<p>go<br />
-  // Efficient save/load operations<br />
-  func (idx *Index) Save(path string) error {<br />
-      // Memory-mapped index persistence<br />
-      // Atomic metadata updates<br />
-      // Crash-safe operations<br />
-  }</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// Efficient save/load operations</span>
+<span class="w">  </span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">Save</span><span class="p">(</span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Memory-mapped index persistence</span>
+<span class="w">      </span><span class="c1">// Atomic metadata updates</span>
+<span class="w">      </span><span class="c1">// Crash-safe operations</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
 <h4 id="production-safeguards">🛡️ Production Safeguards<a class="headerlink" href="#production-safeguards" title="Permanent link">#</a></h4>
 <ul>
 <li><strong>Resource Management</strong></li>
