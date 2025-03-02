@@ -15,6 +15,10 @@
         <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/arrow-ecosystem/">
       
       
+        <link rel="prev" href="../flight/">
+      
+      
+        <link rel="next" href="../go-arrow/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +26,7 @@
     
     
       
-        <title>Introduction - Blog - Thomas F McGeehan V</title>
+        <title>Arrow Ecosystem - Blog - Thomas F McGeehan V</title>
       
     
     
@@ -67,7 +71,7 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Introduction - Blog - Thomas F McGeehan V" >
+        <meta  property="og:title"  content="Arrow Ecosystem - Blog - Thomas F McGeehan V" >
       
         <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
       
@@ -83,7 +87,7 @@
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Introduction - Blog - Thomas F McGeehan V" >
+        <meta  name="twitter:title"  content="Arrow Ecosystem - Blog - Thomas F McGeehan V" >
       
         <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
       
@@ -110,7 +114,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction" class="md-skip">
+        <a href="#abstract" class="md-skip">
           Skip to content
         </a>
       
@@ -144,7 +148,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Arrow Ecosystem
             
           </span>
         </div>
@@ -268,10 +272,12 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../flight/" class="md-tabs__link">
           
   
@@ -354,8 +360,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -369,20 +377,25 @@
       
         
       
-    
-    
-      
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -393,7 +406,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Blog
@@ -416,6 +429,37 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Arrow Ecosystem
+  </span>
+  
+
+      </a>
+      
     </li>
   
 
@@ -548,247 +592,367 @@
   
 
 
-<h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h1>
-<p>Apache Arrow, Arrow Flight, and Arrow Flight SQL form a layered stack for high-performance data analytics. Apache Arrow defines a language-agnostic in-memory columnar format, optimized for speed and zero-copy sharing. Arrow Flight builds an RPC framework on top of Arrow, using gRPC to transmit Arrow data efficiently between processes or across networks. Arrow Flight SQL adds a SQL protocol layer over Flight, allowing clients to execute SQL queries on remote data sources with Arrow as the transport. This paper examines each layer’s architecture and implementation in depth, focusing on memory layout, serialization, RPC mechanisms, and cross-language design, with illustrative code snippets and diagrams.</p>
+<h1 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">#</a></h1>
+<p>The Apache Arrow ecosystem—comprising Apache Arrow, Arrow Flight, and Arrow Flight SQL—forms a powerful stack for high-performance data processing. Apache Arrow provides a language-agnostic, in-memory columnar format, designed for efficient analytics and zero-copy interoperability. Arrow Flight builds upon this foundation with an RPC framework leveraging gRPC, enabling high-speed data exchange between systems. Arrow Flight SQL extends this by offering a SQL protocol layer, allowing clients to execute SQL queries on remote data sources while using Arrow as the underlying transport format.</p>
+<p>This blog explores the architecture, implementation, and performance characteristics of each component, covering memory layout, serialization techniques, RPC mechanisms, and cross-language integration. Through code examples, benchmarks, and visual diagrams, we illustrate how Arrow&rsquo;s design choices translate into real-world efficiency gains for databases, machine learning pipelines, and distributed analytics workloads.</p>
+<h2 id="1-apache-arrow-in-memory-columnar-format">1. Apache Arrow: In-Memory Columnar Format<a class="headerlink" href="#1-apache-arrow-in-memory-columnar-format" title="Permanent link">#</a></h2>
+<p>Apache Arrow establishes a standardized, in-memory columnar format optimized for high-performance analytics. Its design promotes efficient CPU utilization, cross-language interoperability, and zero-copy data sharing.</p>
+<h3 id="columnar-memory-layout">Columnar Memory Layout<a class="headerlink" href="#columnar-memory-layout" title="Permanent link">#</a></h3>
+<ul>
+<li>
+<p><strong>Data Organization:</strong><br />
+  Rather than storing data row-by-row, Arrow arranges data column-by-column. Each column (or Array) is represented by:</p>
+</li>
+<li>
+<p><strong>Metadata:</strong><br />
+    Information such as the array&rsquo;s length and null count.</p>
+</li>
+<li><strong>Buffers:</strong><br />
+    Typically, two buffers per column:  <ul>
+<li>A <strong>validity bitmap</strong> that indicates non-null values.  </li>
+<li>A <strong>data buffer</strong> holding the actual values (e.g., a 32-bit integer array).  </li>
+</ul>
+</li>
+</ul>
+<p>For example, consider a nullable 32-bit integer array with 5 elements. Its structure includes:  </p>
+<ul>
+<li>A 64-bit length (5) and a null count.  </li>
+<li>A validity bitmap (e.g., <code>1 0 1 1 1</code> for values <code>[1, NA, 2, 4, 8]</code>).  </li>
+<li>A corresponding data buffer with values (with <code>NA</code> represented appropriately).  </li>
+</ul>
+<p>This layout is illustrated by a diagram where metadata (gray) stores length and null count, and two buffers (dotted boxes) hold the bitmap and data. Each value is accessed in <strong>O(1) time</strong> via pointer offset arithmetic.</p>
+<ul>
+<li><strong>Memory Alignment:</strong><br />
+  Arrow pads and aligns buffers to <strong>8-byte boundaries</strong> (and ideally to <strong>64-byte cache-line boundaries</strong>) to enhance <strong>sequential scanning</strong> and facilitate <strong>SIMD (Single Instruction, Multiple Data) processing</strong>.</li>
+</ul>
+<h3 id="zero-copy-sharing-and-immutability">Zero-Copy Sharing and Immutability<a class="headerlink" href="#zero-copy-sharing-and-immutability" title="Permanent link">#</a></h3>
+<ul>
+<li>
+<p><strong>Zero-Copy Sharing:</strong><br />
+  Data in Arrow is stored using <strong>relative offsets</strong> instead of <strong>absolute pointers</strong>. This design allows processes to <strong>share data without serialization or copying</strong>. For instance, an Arrow array created in <strong>C++</strong> can be directly shared with <strong>Python</strong> or <strong>Java</strong> simply by transferring the underlying memory buffers.</p>
+</li>
+<li>
+<p><strong>Immutability:</strong><br />
+  Once created, Arrow arrays are <strong>immutable</strong>. This guarantees <strong>thread-safety</strong> and <strong>consistency</strong> in concurrent environments. Any modification results in the creation of a <strong>new array</strong>, thereby avoiding concurrency issues.</p>
+</li>
+<li>
+<p><strong>Interoperability:</strong><br />
+  Arrow&rsquo;s <strong>C Data Interface</strong> enables <strong>safe handoffs between different programming languages</strong>. Whether transferring data between <strong>C++ and Python (via PyArrow)</strong> or across other language boundaries, the standardized format ensures that the receiving process can <strong>interpret the memory correctly</strong>. For <strong>persistent or remote data exchange</strong>, Arrow defines an <strong>IPC (Inter-Process Communication) format</strong> using <strong>FlatBuffers</strong> to serialize schema and metadata while transferring raw column buffers as-is.</p>
+</li>
+</ul>
+<h3 id="language-implementations">Language Implementations<a class="headerlink" href="#language-implementations" title="Permanent link">#</a></h3>
+<p>Apache Arrow is <strong>language-agnostic</strong> with consistent implementations across multiple ecosystems:</p>
+<ul>
+<li>
+<p><strong>C++:</strong><br />
+  Utilizes classes like <code>arrow::Array</code>, <code>arrow::Buffer</code>, and <code>arrow::RecordBatch</code>. Memory is managed via a <strong>MemoryPool</strong> that ensures <strong>proper alignment</strong>, with buffers handled through <strong>reference counting</strong> (using <code>std::shared_ptr</code>).</p>
+</li>
+<li>
+<p><strong>Rust:</strong><br />
+  Offered via the <code>arrow-rs</code> crate, which uses an <strong>ArrayData</strong> structure to encapsulate buffer pointers and metadata. Rust&rsquo;s implementation uses <strong>Arc</strong> for buffer management and carefully leverages <strong>unsafe code</strong> to maintain <strong>64-bit alignment</strong>.</p>
+</li>
+<li>
+<p><strong>Go:</strong><br />
+  Employs <strong>Go slices (<code>[]byte</code>)</strong> to store buffers, adhering to the same <strong>layout and alignment rules</strong> as defined by the Arrow specification.</p>
+</li>
+</ul>
+<p>The uniformity of the memory layout means that an <strong>Arrow file written in one language (e.g., C++) can be memory-mapped and read seamlessly in another (e.g., Rust or Go) without re-parsing the data</strong>.</p>
+<h3 id="vectorized-execution-and-simd-optimizations">Vectorized Execution and SIMD Optimizations<a class="headerlink" href="#vectorized-execution-and-simd-optimizations" title="Permanent link">#</a></h3>
+<ul>
+<li>
+<p><strong>SIMD-Friendly Design:</strong><br />
+  The contiguous <strong>memory layout</strong> of each column allows operations to be <strong>vectorized</strong>. Arrow&rsquo;s compute kernels for tasks such as <strong>arithmetic operations, filtering, and aggregation</strong> are often optimized with <strong>SIMD instructions</strong>. The <strong>Arrow C++ library</strong>, for example, uses <strong>runtime CPU feature detection</strong> to select between <strong>AVX2 and SSE4.2</strong> instructions, depending on hardware capabilities.</p>
+</li>
+<li>
+<p><strong>Data Locality:</strong><br />
+  Storing <strong>column values adjacently in memory</strong> maximizes <strong>cache efficiency</strong>. This design choice supports <strong>highly optimized, pipelined execution on modern CPUs</strong>.</p>
+</li>
+</ul>
+<h3 id="interoperability-and-ipc">Interoperability and IPC<a class="headerlink" href="#interoperability-and-ipc" title="Permanent link">#</a></h3>
+<ul>
+<li>
+<p><strong>Efficient IPC:</strong><br />
+  Arrow&rsquo;s design extends beyond <strong>in-memory processing</strong>. Its <strong>IPC format</strong> serializes <strong>record batches</strong> with a lightweight <strong>FlatBuffer header</strong> (storing <strong>schema and buffer sizes</strong>) followed by the <strong>raw memory buffers</strong>. This approach makes it feasible to <strong>write Arrow data to disk</strong> or <strong>transmit it over a network</strong> with minimal overhead.</p>
+</li>
+<li>
+<p><strong>Foundation for Arrow Flight:</strong><br />
+  The same <strong>IPC format</strong> is later leveraged by <strong>Arrow Flight</strong> for <strong>high-speed, remote data communication</strong>, demonstrating Arrow&rsquo;s role as a <strong>foundational layer</strong> in the broader <strong>Arrow ecosystem</strong>.</p>
+</li>
+</ul>
+<h2 id="2-arrow-flight-high-performance-rpc-for-arrow">2. Arrow Flight: High-Performance RPC for Arrow<a class="headerlink" href="#2-arrow-flight-high-performance-rpc-for-arrow" title="Permanent link">#</a></h2>
+<h3 id="overview-and-architecture">Overview and Architecture<a class="headerlink" href="#overview-and-architecture" title="Permanent link">#</a></h3>
+<p>Arrow Flight is an <strong>RPC framework</strong> designed for <strong>high-speed transfer of Arrow data</strong> between processes or over the network with minimal overhead. Built on <strong>gRPC</strong>, it utilizes <strong>Arrow&rsquo;s IPC format</strong> as the payload for data streams, avoiding costly serialization.</p>
+<p>Instead of converting Arrow data into another format, Flight <strong>transmits Arrow record batches directly</strong>. The protocol organizes data transfer around <strong>FlightData streams</strong>, where clients can:</p>
+<ul>
+<li><strong>Download data</strong> from a Flight server using <code>DoGet</code></li>
+<li><strong>Upload data</strong> using <code>DoPut</code></li>
+<li><strong>Stream bidirectionally</strong> using <code>DoExchange</code></li>
+</ul>
+<p>Flight also provides metadata RPCs for discovering datasets and controlling transfers.</p>
+<h3 id="flight-protocol-dataset-identification-and-retrieval">Flight Protocol: Dataset Identification and Retrieval<a class="headerlink" href="#flight-protocol-dataset-identification-and-retrieval" title="Permanent link">#</a></h3>
+<p>Datasets in Flight are identified using a <strong>FlightDescriptor</strong>, which can be:</p>
+<ul>
+<li>A <strong>textual path</strong></li>
+<li>An <strong>opaque command</strong> (e.g., a SQL query or file path)</li>
+</ul>
+<p>Clients retrieve data in <strong>two steps</strong>:</p>
 <ol>
-<li>Apache Arrow: In-Memory Columnar Format<br />
-Columnar Memory Layout: Apache Arrow defines a standardized in-memory format for tabular data, stored column-by-column rather than row-by-row. Each column (or Array) consists of one or more contiguous memory buffers plus minimal metadata (length, null count, etc.). For example, a nullable 32-bit integer array of 5 elements would have: (a) a 64-bit length (5) and null count, and (b) two buffers – a validity bitmap indicating non-null entries, and a value buffer of 5 int32 values​<br />
-ARROW.APACHE.ORG<br />
-. The figure below illustrates this layout, with a validity bitmap (1 0 1 1 1 for values [1, NA, 2, 4, 8]) and the corresponding data buffer (the ints 1, 2, 4, 8, with NA represented by a 0 in the bitmap). The Arrow format pads and aligns buffers to 8 or 64-byte boundaries for efficient CPU access​<br />
-WESM.GITHUB.IO<br />
-​<br />
-WESM.GITHUB.IO<br />
-, ensuring each value can be accessed in O(1) time via pointer offset arithmetic​<br />
-ARROW.APACHE.ORG<br />
-.</li>
+<li><strong>Call <code>GetFlightInfo</code></strong> with a descriptor to obtain a <code>FlightInfo</code> response, which includes:</li>
+<li>The <strong>schema</strong></li>
+<li><strong>Size estimates</strong></li>
+<li><strong>End-points</strong> (for distributed transfers)</li>
+<li>
+<p>A <strong>Ticket</strong> (a handle for retrieving the data)</p>
+</li>
+<li>
+<p><strong>Call <code>DoGet</code> with the Ticket</strong>, initiating a <strong>stream of Arrow record batches</strong>.</p>
+</li>
 </ol>
-<p>Memory layout of an Arrow int32 Array with 5 elements (including a null). The array’s metadata (gray) stores length and null count. Two buffers (dotted box) hold the validity bitmap and the actual data values. Bits in the bitmap (e.g. 10111) mark non-null values​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-.All Arrow buffers are 64-bit aligned in memory and padded to multiples of 8 bytes​<br />
-WESM.GITHUB.IO<br />
- (and ideally 64 bytes for cache-line alignment​<br />
-WESM.GITHUB.IO<br />
-). This alignment enhances sequential scans and enables use of SIMD (Single Instruction, Multiple Data) CPU instructions on contiguous values. The Arrow format is explicitly designed to be “SIMD and vectorization-friendly”​<br />
-ARROW.APACHE.ORG<br />
-, so analytics libraries can operate on whole chunks of data with one CPU instruction. Arrow’s spec mandates little-endian encoding for multi-byte values, and values are stored in their native binary form (e.g. 4 bytes for int32), eliminating translation overhead​<br />
-WESM.GITHUB.IO<br />
-.Zero-Copy and Immutability: A key feature of Arrow’s design is that data can be shared between processes and languages without serialization or copying, often referred to as zero-copy sharing. Because Arrow uses relative offsets instead of absolute pointers internally, memory can be remapped in another process address space “without pointer swizzling”, i.e. without altering pointer values​<br />
-ARROW.APACHE.ORG<br />
-. This means an Arrow array in C++ can be sent to Python or Java simply by passing the memory buffers (via shared memory or memory mapping), and the consumer can interpret it directly as Arrow data. Arrow arrays are immutable once created, to avoid concurrency issues; any “mutation” creates new arrays under the hood​<br />
-WESM.GITHUB.IO<br />
-. This immutability and standardized layout enable consistent sharing. For cross-language data sharing in-memory, Arrow provides the C Data Interface, a C struct API that lets one language hand off Arrow memory to another safely (for example, PyArrow (Python) can consume an Arrow C++ array via this interface). For persistent or remote transfer, Arrow defines an IPC (Inter-Process Communication) format using FlatBuffers to serialize schema and chunk metadata​<br />
-ARROW.APACHE.ORG<br />
-, while still dumping raw column buffers as-is. This IPC format (Arrow file or stream) is implemented in each language’s library for reading/writing Arrow data to disk or sockets.Language Implementations (C++, Rust, Go, etc.): Arrow’s format is language-agnostic, and there are implementations in C++, Java, Rust, Python (C++ bindings), Go, and more, all adhering to the Arrow columnar spec​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. In C++, Arrow is implemented with classes like arrow::Array, arrow::Buffer, and arrow::RecordBatch, with memory allocated from a MemoryPool (which ensures alignment and may use huge pages). Buffers in C++ are reference-counted (via std::shared_ptr) to manage lifetimes safely across arrays. Rust’s implementation (in the arrow-rs crate) similarly defines an ArrayData struct that holds buffer pointers and metadata for an array​<br />
-ARROW.APACHE.ORG<br />
-. Rust uses Arc for buffer memory and unsafe code to guarantee 64-bit alignment when allocating memory for Arrow buffers. Go’s Arrow library uses Go slices ([]byte) under the hood for buffers and follows the same buffer layout (validity bitmap, offsets, etc.), with care taken to pad and align as required by the spec. Because all implementations use the same physical layout, an Arrow file written in C++ can be memory-mapped and then read in Rust or Go without parsing. The Arrow C++ library also offers a “C Stream” interface and integration components so that (for example) a Rust Arrow iterator can stream data to a C++ consumer purely in memory.Vectorized Execution and SIMD: The columnar layout of Arrow lends itself to vectorized processing. Operations can be applied to entire buffers with tight for-loops that the CPU can optimize with instruction pipelining and vector instructions. Arrow’s compute kernels (e.g. for array arithmetic, filtering, aggregation) are often optimized with SIMD. Arrow C++ uses runtime CPU feature detection to dispatch to the best available instructions – e.g. if AVX2 is available, use 256-bit wide operations, otherwise fall back to SSE4.2​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. This is configurable: setting ARROW_USER_SIMD_LEVEL=AVX2 can force Arrow to use AVX2 paths, for instance​<br />
-ARROW.APACHE.ORG<br />
-. At compile time, Arrow enables a baseline of SSE4.2 optimizations (which means the library won’t run on older CPUs lacking those instructions by default)​<br />
-ARROW.APACHE.ORG<br />
-. An example of a SIMD-optimized operation is Arrow’s memory comparison or sum functions, which load 8 or 16 values at a time into vector registers. In Rust, some of these optimizations are leveraged through LLVM’s auto-vectorization or explicit use of libraries; for example, the Arrow Rust implementation has had experiments with the packed_simd crate to speed up kernels like parsing or math operations, though the performance gains depend on the scenario. Overall, the Arrow format ensures data locality (values of one column are adjacent in memory) which maximizes CPU cache efficiency and enables modern superscalar and SIMD execution to significantly accelerate analytics​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-.Interoperability and IPC: Arrow’s format was designed for interoperability across systems. Besides in-memory sharing, the Arrow IPC mechanism serializes data in a streaming or file format. Under the hood this uses the same memory layout: record batches are encoded as a small FlatBuffer Message header (with metadata like schema, buffer sizes, etc.) followed by the raw concatenated buffers. This means writing Arrow data to disk or sending over a socket doesn’t require per-value processing – it’s essentially dumping the memory as bytes. Arrow Flight (next section) actually uses this IPC format for sending data. Many frameworks use Arrow as a bridge: for example, a C++ process can send an Arrow RecordBatch over shared memory to Python (PyArrow) without converting types, or a Go program can read a Feather/Arrow file written by R. In summary, Apache Arrow provides the foundation: a portable columnar memory format with strong alignment, efficient null representation (bitmaps), and zero-copy shareability, implemented consistently in multiple languages. This foundation is leveraged by Arrow Flight to build high-speed communication.<br />
-2. Arrow Flight: High-Performance RPC for Arrow<br />
-Overview and Architecture: Arrow Flight is an RPC framework for transferring Arrow data between processes or over the network with minimal overhead​<br />
-ARROW.APACHE.ORG<br />
-. It is built on top of gRPC (Google’s HTTP/2 RPC framework) and uses Arrow’s IPC format as the payload for data streams​<br />
-ARROW.APACHE.ORG<br />
-. The core idea is to avoid the usual serialization cost when sending large datasets: since both sender and receiver understand the Arrow format, Flight can send Arrow record batches as-is. Flight organizes data transfer around streams of Arrow record batches (called FlightData streams). A client can download data from a Flight server (using a DoGet operation) or upload data (using DoPut), and both sides can do so in parallel thanks to gRPC’s bidirectional streaming​<br />
-ARROW.APACHE.ORG<br />
-. Flight also provides metadata RPCs for discovering what data is available and controlling the transfer.In the Flight protocol, datasets are identified by a FlightDescriptor (either a textual path or an opaque command)​<br />
-ARROW.APACHE.ORG<br />
-. For example, a FlightDescriptor might contain a SQL query or a file path as the “command” identifying a data set. Clients use a two-step process to retrieve data: first, call GetFlightInfo with a descriptor to get a FlightInfo result describing the dataset (including its schema and endpoints), then call DoGet with a Ticket (from the FlightInfo) to actually stream the Arrow record batches​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. This two-phase approach allows the server to inform the client about dataset size, schema, and possibly multiple endpoints for parallel transfer (more on that below). Additional RPC methods include ListFlights (to list available datasets on the server), GetSchema (to fetch schema without data), and DoAction/ListActions (to perform custom commands outside of data transfer, e.g. cache control)​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. There is also DoExchange, a bidirectional full-duplex stream for advanced use cases (where client and server send Arrow data to each other simultaneously over one channel). Flight’s design exploits gRPC streaming so that large datasets can be sent as a sequence of Arrow messages without re-establishing connections​<br />
-ARROW.APACHE.ORG<br />
-.The diagram below shows a simple Flight retrieval flow: a client requests a dataset by calling GetFlightInfo, the server responds with a FlightInfo (which includes a ticket and location), and then the client calls DoGet to fetch the data stream as Arrow FlightData messages.</p>
-<p>Arrow Flight simple client-server flow​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. The client first calls GetFlightInfo with a descriptor; the server returns a FlightInfo (including schema and a data Ticket). The client then calls DoGet with that Ticket, and the server streams back a sequence of FlightData messages (Arrow record batches) over the network.Flight is designed for high throughput and parallelism. Flight servers can be part of a distributed cluster – for instance, one node might act as a planner/coordinator (handling metadata requests), and others as data nodes (serving the actual partitions of data). In such cases, a GetFlightInfo request to the coordinator can return multiple endpoints (each with a host address and ticket) in the FlightInfo. The client can then perform multiple DoGet calls in parallel to different endpoints to retrieve different partitions of the dataset concurrently​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. This pattern enables horizontal scaling: rather than funneling all data through one server, the client directly pulls from many servers. The Flight protocol natively supports this by allowing FlightInfo to contain a list of endpoints. (For example, Dremio’s distributed system uses a coordinator that returns multiple endpoints and yields 20-50x better throughput than single-node ODBC transfers​<br />
-ARROW.APACHE.ORG<br />
-.)(Optionally, a diagram of a distributed Flight setup with a planner node and multiple data nodes could be shown, illustrating parallel DoGet requests. In text form: A “planner” returns N endpoints in GetFlightInfo, and the client issues N DoGet calls to “data” servers in parallel.)gRPC and Protocol Buffers: Under the hood, Arrow Flight uses gRPC’s code-generated stubs from a protocol buffer definition. The Flight service is defined with RPC methods such as Handshake, ListFlights, GetFlightInfo, DoGet, DoPut, etc., in a Protocol Buffers schema​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. In proto terms, the critical message is FlightData, which encapsulates a chunk of Arrow data. Notably, FlightData has fields: a FlightDescriptor (only set on the first message of a stream), a data_header (which is the serialized Arrow IPC message header for a record batch), an app_metadata (optional user metadata), and the data_body (the raw bytes of the record batch)​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. The data_body is marked as field number 1000 in the proto, which is a trick to ensure it comes last – making it easier to treat as a payload “sidecar” that can be zero-copied​<br />
-ARROW.APACHE.ORG<br />
-. A Flight server, upon sending an Arrow record batch, will produce a FlightData message where data_header and data_body together contain the Arrow IPC representation of that batch. Because Arrow’s IPC format already has a tiny header (with metadata like field lengths, etc.) followed by raw buffers, the FlightData essentially wraps that.Zero-Copy Serialization in Flight: A major implementation goal of Flight is to avoid overhead in converting Arrow data to Protobuf and back. The Arrow developers implemented low-level optimizations in C++ and Java gRPC to achieve zero-copy transfers​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. Instead of letting the Protobuf library copy bytes into a new structure, the Flight implementations intercept the Arrow buffers and send them directly over gRPC. As Wes McKinney described, Flight can “generate the Protobuf wire format for FlightData including the Arrow record batch being sent without&hellip; intermediate memory copying or serialization”​<br />
-ARROW.APACHE.ORG<br />
-. On the receiving end, the implementation “reconstructs an Arrow record batch from the Protobuf representation&hellip; intercepting the encoded data payloads without allowing the Protobuf library to touch them.”​<br />
-ARROW.APACHE.ORG<br />
-. In practical terms, the C++ Flight server uses the gRPC C++ API to write the Arrow buffers as a series of grpc::Slice objects (which can point to existing memory) rather than serializing through the Protobuf reflection API. Similarly, Flight in Java uses Netty’s ByteBuf zero-copy features to send Arrow buffers directly. This way, Flight achieves near-hardware-limited throughput – internal tests report 2-3 GB/s on localhost for Arrow data via Flight (no TLS)​<br />
-ARROW.APACHE.ORG<br />
-, essentially the limit of memory copy over TCP. A consequence of this design is that even if a client is not Arrow-aware (just a generic gRPC client), it can still receive FlightData messages (as byte blobs) and decode them via Protobuf, but it would pay the cost of deserializing those large data_body fields. Flight’s optimized path is available when both sides use the Arrow Flight libraries, giving “have your cake and eat it too” performance – i.e. maximum speed for Arrow-aware clients, while preserving interoperability with any gRPC client if needed​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-.Language-Specific Implementations: Arrow Flight is implemented in multiple languages, typically building on each language’s gRPC library:<br />
-C++: Arrow C++ provides arrow::flight::FlightServerBase and FlightClient classes. A developer implements a C++ Flight service by subclassing FlightServerBase and overriding its virtual methods for the RPC calls (e.g. ListFlights, GetFlightInfo, DoGet, etc.)​<br />
-JORISVANDENBOSSCHE.GITHUB.IO<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. For example, one might override GetFlightInfo to accept a descriptor and return a corresponding FlightInfo (including schema and endpoints)​<br />
-ARROW.APACHE.ORG<br />
-. The base class handles the gRPC interaction under the hood, so your overrides receive high-level Arrow types (like a FlightDescriptor or a FlightMessageReader) instead of raw protobufs. On the client side, FlightClient exposes methods like ListFlights, DoGet (which returns an iterator of record batches), making consumption straightforward. The C++ implementation uses the gRPC C++ engine and registers a service that delegates to your FlightServerBase. Memory is managed with Arrow’s allocator and the zero-copy optimizations described above.<br />
-Java: In Java, Arrow Flight provides similar facilities. A server implements the FlightProducer interface (or extends NoOpFlightProducer which provides no-op defaults)​<br />
-ARROW.APACHE.ORG<br />
-. This interface has methods corresponding to each Flight RPC (e.g. listFlights, getFlightInfo, doGet, etc.). The developer implements these, using Arrow Java libraries (VectorSchemaRoot for batches, etc.) to produce or consume Arrow data. To start a server, Arrow provides a FlightServer builder – you supply a network Location (host/port), an Allocator for Arrow buffers, and your FlightProducer implementation, then call server.start()​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. The client side is similarly straightforward: FlightClient.builder(&hellip;).build() gives a client that can call listFlights(), getStream() etc. as high-level methods​<br />
-ARROW.APACHE.ORG<br />
-. The Java Flight implementation uses gRPC Java under the hood. It also takes advantage of Arrow’s Java memory model (which uses direct ByteBuffers for off-heap memory) to avoid copies. For example, when sending a record batch, the Java implementation can write the Arrow buffers into the Netty channel directly. The Java API differs in style (since Java lacks multiple inheritance): rather than subclassing a base class, you implement callbacks in FlightProducer.<br />
-Rust: Arrow Flight for Rust is provided by the arrow-flight crate (part of the Arrow Rust project). It is a native Rust implementation using Tonic (a Rust gRPC library) and Prost (a Protobuf compiler for Rust)​<br />
-ARROW.APACHE.ORG<br />
-. The crate includes generated structs for all Flight messages (e.g. FlightData, FlightInfo, etc.) and gRPC service traits for client and server (e.g. a generated FlightService trait that one implements)​<br />
-ARROW.APACHE.ORG<br />
-. For convenience, it also offers a higher-level FlightClient with async methods, and utilities to easily convert between Arrow RecordBatches and the FlightData stream​<br />
-ARROW.APACHE.ORG<br />
-. A Rust developer can use these to create a Flight server: implement the tonic-generated server trait for Flight (or use provided base implementations) and handle each method. The Rust implementation currently flags Flight SQL support as experimental (opt-in via a feature)​<br />
-ARROW.APACHE.ORG<br />
-, which parallels the evolving state of Flight SQL in Rust. Because Rust doesn’t have a stable ABI with C++, this Rust implementation is independent (not just bindings to C++). It manages memory using Arrow’s Rust memory model (which ensures buffers are aligned and uses ArrowBuffer internally). While Rust can leverage zero-copy for in-process data, the Tonic library will copy data into its own buffers when sending over the network (this is an area for potential optimization as Rust gRPC matures). In one comparison, Arrow’s C++ Flight outperformed the early Rust version due to such low-level optimizations not yet implemented in Rust​<br />
-ARROW.APACHE.ORG<br />
-, but work is ongoing.<br />
-Go: The Go implementation of Arrow Flight (part of Apache Arrow Go) uses Go’s grpc library. The proto definition includes an option for the Go package​<br />
-ARROW.APACHE.ORG<br />
-, and Arrow’s Go module provides generated interfaces. A Go developer can implement the FlightServiceServer interface (generated by protoc) or more conveniently use Arrow Go’s provided server struct and callback registration. Like in other languages, Arrow Go’s flight server will handle marshalling Arrow RecordBatches to the FlightData protobuf. Go’s garbage-collected runtime doesn’t guarantee 100% zero-copy (there might be some copying when handing bytes to gRPC), but it strives to minimize it. The Go Arrow library uses []byte for buffers, and those can often be handed directly to gRPC as []byte without an extra encoding step. On the client side, Go provides a FlightClient that wraps gRPC calls, delivering Arrow RecordBatch data via channels or callback interfaces. (Python’s Flight implementation is just a binding to C++ – so Python users simply import pyarrow.flight and use the C++ underpinnings.)<br />
-Memory Handling &amp; Serialization: We have touched on this, but to summarize: Arrow Flight’s prime directive is to send Arrow data without serialization overhead. By using the Arrow IPC format as the payload (embedded in the FlightData message), the server does not convert Arrow columns into some row-based format or JSON – it just wraps the existing Arrow buffers. The official Flight spec notes that the FlightData’s body is put as the last field to “help with sidecar patterns” so that some implementations can pull it off the wire efficiently​<br />
-ARROW.APACHE.ORG<br />
-. C++ and Java implementations indeed treat data_body as a sidecar: C++ uses grpc::WriteOptions::setNoCopy() with slices of the Arrow buffer memory​<br />
-ARROW.APACHE.ORG<br />
-, and Java uses Netty’s reference counted buffers. The result is that the overhead of the Flight layer is very small compared to raw socket I/O – as evidenced by throughput tests (multi-gigabyte per second transfers on 10 Gbit links)​<br />
-ARROW.APACHE.ORG<br />
-. Flight also supports optional compression for Arrow buffers (added in newer versions), but since Arrow data is often already compressed at column level (e.g. dictionary-encoded or run-length encoded), many use cases send it uncompressed.Use Cases: Arrow Flight is useful wherever large or streaming data needs to move between processes with low latency. Common scenarios include distributed query engines (offloading result set transfer to Flight instead of ODBC/JDBC), data services that serve Arrow tables to clients (for example, a Flight server in front of a Parquet dataset or a database), and stream processing where one service produces a stream of Arrow batches that consumers subscribe to. Because Flight can easily saturate network bandwidth, it’s suitable for high-speed data lake access or feeding Arrow data into AI/ML pipelines in real time. The Flight protocol also has built-in support for authentication and TLS encryption via gRPC, so it can be used securely in production (it includes a simple token-based auth and can be extended, plus it works with TLS just by using grpc+tls:// URIs​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-). Logging and monitoring can be integrated via gRPC interceptors (Arrow C++ integrates with OpenTelemetry for tracing Flight calls​<br />
-ARROW.APACHE.ORG<br />
-).In summary, Arrow Flight provides a RPC layer specialized for columnar data, leveraging Arrow’s format to eliminate serialization overhead. It is implemented in C++, Java, Rust, Go, and accessible in Python, with consistent semantics across these. With Flight, data engineers can treat remote data as Arrow tables and move them with unprecedented speed. The next layer, Arrow Flight SQL, builds on Flight to make interacting with databases via Arrow even easier.<br />
-3. Arrow Flight SQL: SQL over Arrow Flight<br />
-Overview of Flight SQL: Arrow Flight SQL is a relatively new protocol (introduced in Arrow 7.0.0) that extends Arrow Flight for database connectivity​<br />
-ARROW.APACHE.ORG<br />
-. It allows clients to execute SQL queries, prepare statements, and retrieve database metadata (tables, schemas, etc.) over Arrow Flight​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. In essence, it defines a standardized set of RPC calls and message types for SQL operations, using Arrow Flight’s efficient transport as the carrier. The goal is to provide an Arrow-native alternative to ODBC/JDBC – one that avoids the row-by-row data conversion overhead of those older interfaces​<br />
-ARROW.APACHE.ORG<br />
-. With Flight SQL, a client can talk to any database or query engine that implements the Flight SQL server API, and receive results as Arrow tables (which can be used directly in pandas, Spark, DataFrame libraries, etc., without copy). Flight SQL is not meant to replace SQL query languages or engines – rather, it’s a common wire protocol. A Flight SQL server is essentially a thin wrapper around a database or query engine: it receives Flight SQL requests (like “execute this query”), forwards them to the database internally, then streams the results back in Arrow format.Protocol and Commands: Flight SQL builds on the base Flight RPCs by using the concept of FlightDescriptor commands and Action messages to represent SQL requests. The Flight SQL spec defines a set of Command message types (Protobuf messages) for various operations​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-:<br />
-Metadata queries (getting database/catalog info): e.g. CommandGetTables (list tables), CommandGetSchemas, CommandGetCatalogs, CommandGetSqlInfo (get DB capabilities), CommandGetPrimaryKeys, CommandGetExportedKeys etc.​<br />
-ARROW.APACHE.ORG<br />
-. These correspond to metadata calls akin to JDBC’s DatabaseMetaData functions.<br />
-Executing queries: CommandStatementQuery for a direct SQL query (SELECT), and CommandStatementUpdate for an update (INSERT/UPDATE/DELETE) that returns an affected row count​<br />
-ARROW.APACHE.ORG<br />
-.<br />
-Prepared statements: ActionCreatePreparedStatementRequest (client asks server to prepare a query), which returns an ActionCreatePreparedStatementResult containing a handle. Then CommandPreparedStatementQuery or CommandPreparedStatementUpdate can execute that prepared statement (with the given handle)​<br />
-ARROW.APACHE.ORG<br />
-. There’s also an ActionClosePreparedStatementRequest to close the handle.<br />
-Under Flight SQL, a typical query execution goes through the standard Flight methods but with these special commands encapsulated. For example, to execute a SQL SELECT query, a client does: create a FlightDescriptor whose type is CMD and whose content is a serialized CommandStatementQuery (with the SQL string). It calls GetFlightInfo on the Flight server with this descriptor​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. The server sees the descriptor contains a SQL command, so it plans the query and doesn’t send data yet – it responds with a FlightInfo that includes schema (the schema of the result set) and a Ticket that represents the execution result. The client then calls DoGet with that Ticket​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-, and the server streams back the result set as Arrow record batches (FlightData). This is analogous to a JDBC client receiving a ResultSet, but here it’s all Arrow data. The above two-step (GetFlightInfo + DoGet) is necessary so the client can retrieve schema and potentially distribute the call (if the FlightInfo had multiple endpoints). In practice, libraries provide a simpler API (e.g. one call that wraps these steps).For a metadata request like listing tables, the pattern is the same: the client creates a descriptor with CommandGetTables (optionally specifying a filter or schema), calls GetFlightInfo, then DoGet to get the results (the list of tables as an Arrow table)​<br />
-ARROW.APACHE.ORG<br />
-. For an update that doesn’t return rows, the client can use DoGet which returns just a small batch (e.g. one row with the row count), or in some cases they might use DoAction for a confirmation.Prepared Statement Flow: Flight SQL’s prepared statements involve multiple RPCs and demonstrate how it layers on Flight’s existing calls. To prepare a statement, the client calls DoAction with an ActionCreatePreparedStatementRequest (containing the SQL)​<br />
-ARROW.APACHE.ORG<br />
-. The server responds (via the action result) with a handle (often just an integer or GUID identifier for the prepared statement on the server)​<br />
-ARROW.APACHE.ORG<br />
-. Now the client can bind parameters. Flight SQL expects the client to use DoPut for parameter binding: the client calls DoPut and the first message it sends has a descriptor of type CommandPreparedStatementUpdate (or Query) containing that prepared statement handle, and then it streams one or more Arrow record batches as the parameters for the parameterized query​<br />
-ARROW.APACHE.ORG<br />
-. The server executes the prepared statement for each set of parameters (or batch, depending on semantics) and can return a PutResult for each, including e.g. number of rows affected. Finally, the client issues a DoAction with ActionClosePreparedStatementRequest to clean up​<br />
-ARROW.APACHE.ORG<br />
-. While this is a bit intricate, it’s all built on the fundamental Arrow Flight streaming calls, just using specific message payloads to indicate what to do.Integration with Database Engines: A Flight SQL server needs to translate these Flight SQL calls into actual database operations. The implementation typically involves a server-side handler that implements a Flight SQL Producer interface. For instance, Arrow C++ provides a FlightSqlServerBase class (subclass of FlightServerBase) that already implements the base Flight RPCs and dispatches to new abstract methods for the SQL-specific commands​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. As the documentation notes, “Applications should subclass this class and override the virtual methods declared on this class.”​<br />
-ARROW.APACHE.ORG<br />
-. Those methods include things like ExecuteSqlQuery, GetTables, GetSqlInfo, etc., corresponding to the Flight SQL commands​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. The base class takes care of the boilerplate: for example, it overrides the base GetFlightInfo and DoGet (making them final) to intercept when a FlightDescriptor is actually a StatementQuery command and then calls your ExecuteSqlQuery override, etc.​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. This design simplifies custom servers: you focus on how to execute a given SQL command and produce Arrow data, and the Flight SQL framework wraps it into the Flight RPC flow.In Java, the Flight SQL support similarly will provide an interface (e.g. FlightSqlProducer) that extends the normal Flight FlightProducer. The Java implementation (as of Arrow 10) included a skeleton and is evolving; for example, there are helper classes to create a Flight SQL server by wrapping an existing JDBC data source, which can ease integration for databases that already have JDBC – but more efficiently, one would implement it natively. In Rust, as noted, Flight SQL is experimental: the Arrow Rust flight crate has a sql module​<br />
-ARROW.APACHE.ORG<br />
-, likely providing the protobuf definitions for the Flight SQL messages and maybe some helper for clients. A full Rust server would need to implement the Flight SQL protocol (perhaps using DataFusion as the query engine).Use with DuckDB, DataFusion, etc.: Flight SQL’s power is evident when integrating with modern embedded databases. For example, DuckDB (an in-process analytical database) has a native Arrow interface – it can output query results as Arrow record batches. A Flight SQL server can embed DuckDB: when it receives a CommandStatementQuery with some SQL, it forwards that SQL to DuckDB’s query runner (within the same process). DuckDB executes and produces an Arrow table in memory. The Flight SQL server then simply wraps those Arrow record batches and streams them out via Flight. Because DuckDB and Arrow Flight are both highly optimized in C++ and share memory, this yields a very fast pipeline – the data doesn’t need to be converted to rows or copied. In fact, DuckDB’s developers have showcased &gt;10x speedups in data transfer by using Flight SQL compared to client fetching via ODBC​<br />
-DORIS.APACHE.ORG<br />
-. Similarly, DataFusion (an Apache Arrow Rust query engine) can be put behind a Flight SQL server. DataFusion’s query results are already Arrow RecordBatches in Rust memory; a Rust Flight SQL server can take those and send them out directly. This essentially turns DataFusion into a SQL endpoint that Arrow clients (or tools via an Arrow ODBC driver) can query. Another example is Dremio and InfluxDB: Dremio has integrated Flight/Flight SQL to allow Arrow-based clients to retrieve data faster than ODBC. InfluxDB (time-series database) in its Cloud edition has added Flight SQL so that SQL queries to Influx return Arrow data frames efficiently​<br />
-DOCS.INFLUXDATA.COM<br />
-. Even traditional databases like MySQL or Postgres can benefit: an adapter can retrieve their results and present as Arrow via Flight SQL, avoiding the overhead of text or binary row protocols and then conversion to Arrow on the client.Client Side (Language Support): On the client side, Flight SQL is typically used via an official driver or API in each language. C++ and Java have Flight SQL client classes that wrap the generic FlightClient. For instance, C++ offers FlightSqlClient which has methods like Execute, GetTables, etc., and internally it serializes the appropriate protobuf and calls Flight RPCs (GetFlightInfo, DoGet) for you​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. Python’s pyarrow.flight module now includes FlightSqlClient which allows a Python user to connect to a Flight SQL server and, for example, call .execute(&ldquo;SELECT * FROM table&rdquo;) and get a pyarrow.Table result – under the hood this uses the C++ Flight SQL client to perform the sequence of calls. There is also ongoing work on an ADBC (Arrow Database Connectivity) API, which is a higher-level abstraction where Flight SQL is one driver; however, focusing on implementation, Flight SQL is the wire protocol that ADBC would use for network connections.Performance Considerations: By using Flight SQL, the data path from database to client is fully columnar. This avoids the classic “row-to-column” conversion cost of fetching data via JDBC (which yields rows that analytical tools then pack into columns). A measurement cited by Dremio is that converting columnar&lt;-&gt;row for JDBC/ODBC can consume 60–90% of the time in data transfer​<br />
-DREMIO.COM<br />
-; Flight SQL skips that by keeping everything in Arrow format. Moreover, Flight SQL can return result sets partitioned across endpoints, allowing massive parallel retrieval for big queries (if the database supports distributing the query results). The Flight SQL protocol supports features like transaction handling (there are calls for begin/commit) and also passes through database-specific info (e.g. the GetSqlInfo call can retrieve DB-specific capabilities flags). It’s built to be extensible as well – if new metadata or commands are needed, they can be added in future versions in a backwards-compatible way.In implementation, a Flight SQL server may be slightly heavier than a raw Flight server because it must maintain some state: e.g. track prepared statement handles, and possibly manage transactions if those are used. The Arrow Flight SQL spec includes the concept of a server-managed session (potentially with cookies or tokens to maintain context like an open transaction)​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-, but a simple implementation can also ignore sessions and treat each call statelessly (except transactions which need explicit begin/commit tracking).Example: Suppose we integrate Flight SQL with SQLite (a single-file SQL database). We subclass FlightSqlServerBase in C++ to create SQLiteFlightSqlServer. In our override of GetTables (for CommandGetTables), we execute SELECT name, type &hellip; FROM sqlite_master to get table names, convert that to an Arrow RecordBatch (two columns: table name, table type). We then return that as the result for the Flight DoGet. For ExecuteSql (CommandStatementQuery), we execute the query on SQLite (perhaps using SQLite’s C API), then for each row of the result, append to Arrow arrays. Because SQLite is not columnar, we have to copy data into Arrow format, but once that’s done, Arrow takes over for sending it. For a more Arrow-native backend like DuckDB, we could avoid even that copy by using DuckDB’s Arrow interface. The end result: a client (could be Python or Java) can use Flight SQL to query SQLite or DuckDB as if they were a remote SQL service, getting Arrow data back.In conclusion, Arrow Flight SQL brings the efficiency of Arrow Flight to the world of SQL-based data access. Its implementation builds on the strong foundation of Arrow’s columnar format and Flight’s zero-copy streaming RPC. By standardizing how queries and results are handled (and doing so in a language-agnostic way), it allows data engineers to write one client that can query many different databases using the same approach​<br />
-VOLTRONDATA.COM<br />
-​<br />
-VOLTRONDATA.COM<br />
-. At the same time, it spares database developers from writing custom protocol drivers – they can leverage the Flight SQL framework and focus on extracting data into Arrow. With broad support across languages (C++, Java, Rust, Go, Python, etc.), Flight SQL is poised to become a high-performance alternative to ODBC/JDBC for analytics, offering both speed and simplicity in accessing big data.References: The technical details above draw from the Apache Arrow project documentation and blog posts, including the Arrow Columnar Format spec​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-WESM.GITHUB.IO<br />
-, design discussions on Flight RPC​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-, and the introducing Flight SQL blog post​<br />
-ARROW.APACHE.ORG<br />
-​<br />
-ARROW.APACHE.ORG<br />
-, as well as code references from Arrow’s C++ and Rust implementations​<br />
-JORISVANDENBOSSCHE.GITHUB.IO<br />
-​<br />
-ARROW.APACHE.ORG<br />
-. These illustrate the architecture and optimizations of Arrow’s memory format and the Flight/Flight SQL layers that build upon it. The convergence of columnar in-memory format and an RPC mechanism tailored to it is what makes Arrow, Flight, and Flight SQL a powerful stack for modern data engineering.</p>
+<p>Additional RPC methods include:</p>
+<ul>
+<li><code>ListFlights</code> – List available datasets</li>
+<li><code>GetSchema</code> – Fetch schema without retrieving data</li>
+<li><code>DoAction</code> / <code>ListActions</code> – Perform custom commands (e.g., cache control)</li>
+<li><code>DoExchange</code> – A <strong>full-duplex bidirectional stream</strong> for advanced use cases</li>
+</ul>
+<p>Flight&rsquo;s use of <strong>gRPC streaming</strong> allows <strong>large datasets</strong> to be sent <strong>as a sequence of Arrow messages</strong> without repeatedly establishing connections.</p>
+<h3 id="distributed-and-parallel-data-transfer">Distributed and Parallel Data Transfer<a class="headerlink" href="#distributed-and-parallel-data-transfer" title="Permanent link">#</a></h3>
+<p>Flight is designed for <strong>high throughput and parallelism</strong>:</p>
+<ul>
+<li><strong>Distributed clusters</strong> can use a <strong>planner-coordinator</strong> model:</li>
+<li>A <strong>coordinator node</strong> handles metadata requests.</li>
+<li><strong>Data nodes</strong> serve partitions of data.</li>
+<li>
+<p>A <code>GetFlightInfo</code> request to the coordinator returns <strong>multiple endpoints</strong> for parallel transfer.</p>
+</li>
+<li>
+<p><strong>Parallel retrieval</strong>:</p>
+</li>
+<li>The client receives <strong>N endpoints</strong> in <code>FlightInfo</code>.</li>
+<li>It <strong>launches N <code>DoGet</code> requests</strong> to different servers simultaneously.</li>
+<li>This enables <strong>horizontal scaling</strong>, where data is pulled <strong>directly from multiple servers</strong> instead of funneling through one.</li>
+</ul>
+<h3 id="grpc-and-protocol-buffers">gRPC and Protocol Buffers<a class="headerlink" href="#grpc-and-protocol-buffers" title="Permanent link">#</a></h3>
+<p>Arrow Flight <strong>extends gRPC</strong> with a <strong>custom Protobuf-based API</strong>. The key message type is <code>FlightData</code>, which contains:</p>
+<ul>
+<li><strong>FlightDescriptor</strong> (only set on the first message of a stream)</li>
+<li><strong>Data header</strong> (Arrow IPC message header for a record batch)</li>
+<li><strong>Application metadata</strong> (optional)</li>
+<li><strong>Data body</strong> (raw bytes of the record batch)</li>
+</ul>
+<p>Flight optimizes message structure to <strong>minimize copying</strong>, ensuring <strong>zero-copy transfers</strong> whenever possible.</p>
+<h3 id="zero-copy-serialization-in-flight">Zero-Copy Serialization in Flight<a class="headerlink" href="#zero-copy-serialization-in-flight" title="Permanent link">#</a></h3>
+<p>A major goal of Flight is to <strong>avoid overhead</strong> in converting Arrow data to Protobuf and back. Implementations achieve <strong>zero-copy</strong> transfers by:</p>
+<ul>
+<li><strong>Intercepting Arrow buffers</strong> and sending them directly over gRPC.</li>
+<li><strong>Bypassing Protobuf serialization</strong>, directly writing Arrow data as <code>grpc::Slice</code> objects in C++.</li>
+<li><strong>Leveraging Netty&rsquo;s <code>ByteBuf</code></strong> for zero-copy transfers in Java.</li>
+</ul>
+<p>This design achieves <strong>near-hardware-limited throughput</strong>, with <strong>internal tests showing 2-3 GB/s over TCP</strong> on localhost.</p>
+<p>Even non-Arrow-aware gRPC clients can receive Flight messages as byte blobs and deserialize them manually, though they won&rsquo;t benefit from zero-copy optimizations.</p>
+<h3 id="language-specific-implementations">Language-Specific Implementations<a class="headerlink" href="#language-specific-implementations" title="Permanent link">#</a></h3>
+<p>Arrow Flight is implemented in multiple languages, typically built on each language&rsquo;s gRPC library:</p>
+<ul>
+<li><strong>C++:</strong>  </li>
+<li>Provides <code>arrow::flight::FlightServerBase</code> and <code>FlightClient</code>.</li>
+<li>Developers subclass <code>FlightServerBase</code> and override virtual methods for RPCs (<code>ListFlights</code>, <code>GetFlightInfo</code>, <code>DoGet</code>, etc.).</li>
+<li>
+<p>Uses Arrow&rsquo;s memory allocator and zero-copy optimizations.</p>
+</li>
+<li>
+<p><strong>Java:</strong>  </p>
+</li>
+<li>Implements <code>FlightProducer</code> (or extends <code>NoOpFlightProducer</code>).</li>
+<li>Uses <code>VectorSchemaRoot</code> for Arrow data.</li>
+<li><code>FlightServer.builder(...).start()</code> initializes a Flight server.</li>
+<li>
+<p>Built on <strong>gRPC Java</strong> and uses <strong>Netty&rsquo;s direct ByteBuffers</strong> for efficient transfers.</p>
+</li>
+<li>
+<p><strong>Rust:</strong>  </p>
+</li>
+<li>Provided by the <code>arrow-flight</code> crate, built on <strong>Tonic</strong> (Rust&rsquo;s gRPC library).</li>
+<li>Uses <strong>async methods</strong> for client-server interactions.</li>
+<li>
+<p>Experimental <strong>Flight SQL support</strong> (opt-in via feature flags).</p>
+</li>
+<li>
+<p><strong>Go:</strong>  </p>
+</li>
+<li>Part of the <strong>Apache Arrow Go</strong> module.</li>
+<li>Implements <code>FlightServiceServer</code> with gRPC.</li>
+<li>
+<p>Uses <code>[]byte</code> slices for Arrow buffers.</p>
+</li>
+<li>
+<p><strong>Python:</strong>  </p>
+</li>
+<li>Python&rsquo;s Flight implementation is a <strong>binding to the C++ library</strong> (<code>pyarrow.flight</code>).</li>
+</ul>
+<h3 id="memory-handling-serialization">Memory Handling &amp; Serialization<a class="headerlink" href="#memory-handling-serialization" title="Permanent link">#</a></h3>
+<p>Arrow Flight is optimized for <strong>direct Arrow data transport</strong>:</p>
+<ul>
+<li>Uses the <strong>Arrow IPC format</strong> as the payload, avoiding serialization overhead.</li>
+<li>Treats <code>FlightData.data_body</code> as a <strong>sidecar</strong> for efficient transmission.</li>
+<li>C++ uses <code>grpc::WriteOptions::setNoCopy()</code>, and Java utilizes <strong>Netty&rsquo;s reference-counted buffers</strong>.</li>
+<li>Supports <strong>optional compression</strong> of Arrow buffers.</li>
+</ul>
+<p>Throughput benchmarks show that <strong>Flight approaches raw socket I/O speeds</strong>, making it one of the fastest RPC solutions for data analytics.</p>
+<h3 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">#</a></h3>
+<p>Arrow Flight is ideal for <strong>low-latency, large-scale data movement</strong>. Common use cases include:</p>
+<ol>
+<li><strong>Distributed Query Engines</strong>  </li>
+<li>Replaces ODBC/JDBC for <strong>fast result set transfers</strong>.</li>
+<li>
+<p>Example: Dremio&rsquo;s use of Flight yields <strong>20-50x higher throughput</strong> than ODBC.</p>
+</li>
+<li>
+<p><strong>Data Services &amp; APIs</strong>  </p>
+</li>
+<li>A Flight server in front of <strong>Parquet datasets or databases</strong>.</li>
+<li>
+<p>Enables clients to query data in <strong>Arrow format natively</strong>.</p>
+</li>
+<li>
+<p><strong>Streaming Data Pipelines</strong>  </p>
+</li>
+<li>A producer service <strong>streams Arrow record batches</strong> to consumers.</li>
+<li>
+<p>Enables real-time ingestion into <strong>AI/ML pipelines</strong>.</p>
+</li>
+<li>
+<p><strong>Data Lake Access</strong>  </p>
+</li>
+<li>Direct, <strong>high-speed retrieval</strong> of Arrow tables from a remote storage system.</li>
+<li>
+<p>Maximizes network bandwidth utilization.</p>
+</li>
+<li>
+<p><strong>Secure Data Transfer</strong>  </p>
+</li>
+<li>Built-in <strong>TLS encryption</strong> (using <code>grpc+tls://</code> URIs).</li>
+<li>Authentication via <strong>token-based mechanisms</strong>.</li>
+<li>OpenTelemetry support for <strong>tracing Flight calls</strong>.</li>
+</ol>
+<h2 id="3-arrow-flight-sql-sql-over-arrow-flight">3. Arrow Flight SQL: SQL over Arrow Flight<a class="headerlink" href="#3-arrow-flight-sql-sql-over-arrow-flight" title="Permanent link">#</a></h2>
+<h3 id="overview-of-flight-sql">Overview of Flight SQL<a class="headerlink" href="#overview-of-flight-sql" title="Permanent link">#</a></h3>
+<p>Arrow Flight SQL is a <strong>protocol introduced in Arrow 7.0.0</strong> that extends <strong>Arrow Flight for database connectivity</strong>. While traditional JDBC drivers transmit query results row-by-row, requiring serialization and deserialization at both ends, Flight SQL sends data in Arrow&rsquo;s native format using gRPC streaming, eliminating conversion overhead and enabling parallel retrieval.</p>
+<p>Flight SQL is the transport layer, defining how SQL queries and results move between clients and databases over Arrow Flight. ADBC (Arrow Database Connectivity) sits on top of Flight SQL, providing a developer-friendly API for interacting with multiple databases without needing to implement raw Flight SQL calls. This layered architecture enables database vendors to focus on implementing the Flight SQL protocol while application developers can work with the simpler ADBC interface.</p>
+<p>The protocol enables clients to:</p>
+<ul>
+<li><strong>Execute SQL queries</strong></li>
+<li><strong>Prepare statements</strong></li>
+<li><strong>Retrieve database metadata</strong> (e.g., tables, schemas, catalogs)</li>
+</ul>
+<p>Flight SQL defines a <strong>standardized set of RPC calls and message types</strong> for SQL operations, leveraging <strong>Arrow Flight&rsquo;s high-performance transport</strong>. The goal is to provide an <strong>Arrow-native alternative to ODBC/JDBC</strong>, eliminating <strong>row-to-column conversion overhead</strong>.</p>
+<p>With Flight SQL, clients can communicate with any database or query engine that implements the Flight SQL API and receive results as <strong>Arrow tables</strong>, which can be directly used in <strong>pandas, Spark, DataFrame libraries, etc., without copy</strong>.</p>
+<p>A Flight SQL server acts as a <strong>thin wrapper</strong> around a database engine: it <strong>receives SQL queries, executes them, and streams results back as Arrow data</strong>.</p>
+<h3 id="flight-sql-protocol-and-commands">Flight SQL Protocol and Commands<a class="headerlink" href="#flight-sql-protocol-and-commands" title="Permanent link">#</a></h3>
+<p>Flight SQL builds on <strong>Flight RPCs</strong>, utilizing <strong>FlightDescriptor commands</strong> and <strong>Action messages</strong> to represent SQL requests. The protocol defines <strong>specific Protobuf message types</strong> for various operations and supports token-based authentication and TLS encryption, ensuring secure database connectivity in distributed environments.</p>
+<h4 id="metadata-queries-database-catalog-info"><strong>Metadata Queries</strong> (Database Catalog Info)<a class="headerlink" href="#metadata-queries-database-catalog-info" title="Permanent link">#</a></h4>
+<ul>
+<li><code>CommandGetTables</code> – List tables</li>
+<li><code>CommandGetSchemas</code> – Retrieve schemas</li>
+<li><code>CommandGetCatalogs</code> – Retrieve database catalogs</li>
+<li><code>CommandGetSqlInfo</code> – Fetch DB capabilities</li>
+<li><code>CommandGetPrimaryKeys</code> / <code>CommandGetExportedKeys</code> – Retrieve key relationships</li>
+</ul>
+<h4 id="query-execution"><strong>Query Execution</strong><a class="headerlink" href="#query-execution" title="Permanent link">#</a></h4>
+<ul>
+<li><code>CommandStatementQuery</code> – Execute a <strong>SQL SELECT</strong> query.</li>
+<li><code>CommandStatementUpdate</code> – Execute an <strong>INSERT/UPDATE/DELETE</strong> query, returning affected row count.</li>
+</ul>
+<h4 id="prepared-statements"><strong>Prepared Statements</strong><a class="headerlink" href="#prepared-statements" title="Permanent link">#</a></h4>
+<ul>
+<li><code>ActionCreatePreparedStatementRequest</code> – Client requests query preparation.</li>
+<li><code>CommandPreparedStatementQuery</code> / <code>CommandPreparedStatementUpdate</code> – Execute a prepared statement.</li>
+<li><code>DoPut</code> – Used for <strong>parameter binding</strong> by streaming Arrow batches.</li>
+<li><code>ActionClosePreparedStatementRequest</code> – Clean up prepared statements.</li>
+</ul>
+<h3 id="query-execution-flow-in-flight-sql">Query Execution Flow in Flight SQL<a class="headerlink" href="#query-execution-flow-in-flight-sql" title="Permanent link">#</a></h3>
+<p>A <strong>typical SQL query execution</strong> follows this sequence:</p>
+<ol>
+<li><strong>Client sends <code>GetFlightInfo</code></strong> with a <code>FlightDescriptor</code> containing a <code>CommandStatementQuery</code> (SQL string).</li>
+<li><strong>Server responds with <code>FlightInfo</code></strong>, including:</li>
+<li><strong>Schema</strong> of the result set.</li>
+<li><strong>Ticket</strong> representing the execution result.</li>
+<li><strong>Optional multiple endpoints</strong> (for distributed retrieval).</li>
+<li><strong>Client calls <code>DoGet</code></strong> with the Ticket.</li>
+<li><strong>Server streams Arrow record batches</strong> (<code>FlightData</code>) to the client.</li>
+</ol>
+<p>This flow is analogous to JDBC returning a <code>ResultSet</code>, but <strong>entirely in Arrow format</strong>, avoiding row-based transformations.</p>
+<p>Metadata queries (e.g., listing tables) follow the same <strong><code>GetFlightInfo → DoGet</code> pattern</strong>.</p>
+<h4 id="prepared-statement-flow"><strong>Prepared Statement Flow</strong><a class="headerlink" href="#prepared-statement-flow" title="Permanent link">#</a></h4>
+<p>Prepared statements introduce <strong>multiple RPC interactions</strong>:</p>
+<ol>
+<li><strong>Client calls <code>DoAction</code></strong> with <code>ActionCreatePreparedStatementRequest</code> (containing the SQL query).</li>
+<li><strong>Server responds</strong> with a handle (identifier for the prepared statement).</li>
+<li><strong>Client binds parameters</strong> via <code>DoPut</code>, sending Arrow batches.</li>
+<li><strong>Server executes the prepared statement</strong> for each batch.</li>
+<li><strong>Client calls <code>DoAction</code></strong> with <code>ActionClosePreparedStatementRequest</code> to clean up.</li>
+</ol>
+<p>Despite its complexity, this system <strong>optimizes parameterized queries</strong>, particularly for <strong>batch inserts and updates</strong>.</p>
+<h3 id="integration-with-database-engines"><strong>Integration with Database Engines</strong><a class="headerlink" href="#integration-with-database-engines" title="Permanent link">#</a></h3>
+<p>A <strong>Flight SQL server</strong> must translate Flight SQL calls into <strong>actual database operations</strong>. Implementations typically subclass a <strong>Flight SQL Producer</strong> interface.</p>
+<h4 id="c-implementation"><strong>C++ Implementation</strong><a class="headerlink" href="#c-implementation" title="Permanent link">#</a></h4>
+<ul>
+<li><strong><code>FlightSqlServerBase</code></strong>: A base class for Flight SQL servers.</li>
+<li>Provides <strong>overridable methods</strong> (<code>ExecuteSqlQuery</code>, <code>GetTables</code>, etc.).</li>
+<li>Handles <strong>Flight RPC dispatching</strong> automatically.</li>
+</ul>
+<p>Developers <strong>only need to implement SQL execution</strong>, while Flight SQL manages <strong>metadata retrieval, query planning, and data streaming</strong>.</p>
+<h4 id="java-implementation"><strong>Java Implementation</strong><a class="headerlink" href="#java-implementation" title="Permanent link">#</a></h4>
+<ul>
+<li><strong><code>FlightSqlProducer</code></strong>: Java equivalent of <code>FlightSqlServerBase</code>.</li>
+<li><strong>Can wrap an existing JDBC source</strong> or provide a <strong>native integration</strong>.</li>
+<li>Uses <strong>Arrow&rsquo;s off-heap memory model</strong> for efficient transfers.</li>
+</ul>
+<h4 id="rust-go-implementations"><strong>Rust &amp; Go Implementations</strong><a class="headerlink" href="#rust-go-implementations" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Rust (<code>arrow-flight</code> crate)</strong>: Flight SQL is experimental but provides SQL message definitions.</li>
+<li><strong>Go</strong>: Uses <code>FlightServiceServer</code>, integrating with Go&rsquo;s gRPC framework.</li>
+</ul>
+<h4 id="example-use-cases"><strong>Example Use Cases</strong><a class="headerlink" href="#example-use-cases" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>DuckDB</strong>: Since DuckDB <strong>natively supports Arrow</strong>, a Flight SQL server can:</li>
+<li>Receive SQL queries.</li>
+<li>Execute them within <strong>DuckDB&rsquo;s in-process engine</strong>.</li>
+<li>Stream results <strong>directly as Arrow tables</strong> without conversion.</li>
+<li><strong>DataFusion (Rust Query Engine)</strong>: Flight SQL turns DataFusion into a <strong>high-speed SQL service</strong>.</li>
+<li><strong>Dremio &amp; InfluxDB</strong>: Use Flight SQL to <strong>serve Arrow-based queries faster</strong> than ODBC/JDBC.</li>
+</ul>
+<p>Even traditional databases like <strong>PostgreSQL and MySQL</strong> benefit: an adapter can <strong>fetch rows, convert them to Arrow, and serve via Flight SQL</strong>, avoiding <strong>binary/text-based row protocols</strong>.</p>
+<h3 id="client-side-usage"><strong>Client-Side Usage</strong><a class="headerlink" href="#client-side-usage" title="Permanent link">#</a></h3>
+<p>Flight SQL is <strong>accessible across multiple languages</strong>, with high-level APIs:</p>
+<ul>
+<li><strong>C++:</strong> <code>FlightSqlClient</code> simplifies Flight SQL interactions.</li>
+<li><strong>Java:</strong> Provides <code>FlightSqlClient</code> for executing queries and fetching results.</li>
+<li><strong>Python:</strong> <code>pyarrow.flight.FlightSqlClient</code> allows Python users to run:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>  <span class="n">client</span> <span class="o">=</span> <span class="n">flight</span><span class="o">.</span><span class="n">FlightSqlClient</span><span class="p">(</span><span class="s2">&quot;grpc://localhost:50051&quot;</span><span class="p">)</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM my_table&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>Returns Arrow tables directly usable in pandas, NumPy, Spark.</li>
+<li>ADBC (Arrow Database Connectivity): A higher-level abstraction built on Flight SQL.</li>
+</ul>
+<h3 id="performance-benefits-of-flight-sql">Performance Benefits of Flight SQL<a class="headerlink" href="#performance-benefits-of-flight-sql" title="Permanent link">#</a></h3>
+<p>Flight SQL&rsquo;s columnar nature eliminates the row-based inefficiencies of ODBC/JDBC:</p>
+<p>-Avoids row-to-column conversion (which can consume 60-90% of JDBC data transfer time).<br />
+-Supports partitioned result sets, enabling parallel query retrieval.<br />
+-Optimized for Arrow-native databases (e.g., DuckDB, DataFusion).<br />
+-Maintains transactional integrity (via BeginTransaction / CommitTransaction calls).<br />
+-Extensible: New metadata or commands can be added backwards-compatibly.</p>
+<h2 id="the-future-of-data-movement">The Future of Data Movement<a class="headerlink" href="#the-future-of-data-movement" title="Permanent link">#</a></h2>
+<p>The Apache Arrow ecosystem represents a fundamental shift in how we think about data movement and processing in modern computing. By providing a standardized columnar memory format (Arrow), an efficient RPC framework (Flight), and a SQL interface layer (Flight SQL), it addresses the entire stack of data processing needs:</p>
+<ul>
+<li><strong>At the Memory Level</strong>: Arrow&rsquo;s zero-copy sharing and SIMD optimization enable unprecedented performance for analytical workloads.</li>
+<li><strong>At the Network Level</strong>: Flight&rsquo;s streaming protocol and zero-serialization design approach hardware limits for data transfer speeds.</li>
+<li><strong>At the Application Level</strong>: Flight SQL makes these benefits accessible through familiar SQL interfaces while maintaining Arrow&rsquo;s performance advantages.</li>
+</ul>
+<p>As data volumes continue to grow and real-time analytics become increasingly critical, the Arrow ecosystem&rsquo;s importance will only increase. Its adoption by major databases, analytics engines, and data processing frameworks suggests it&rsquo;s becoming the de facto standard for high-performance data exchange.</p>
+<p>The future points toward a world where data moves seamlessly between systems, languages, and frameworks, with Arrow as the common foundation. Whether you&rsquo;re building a distributed database, a machine learning pipeline, or a real-time analytics system, the Arrow ecosystem provides the tools needed to handle data at scale with exceptional efficiency.</p>
+<p>For developers and organizations looking to stay ahead in the data processing landscape, understanding and adopting the Arrow ecosystem isn&rsquo;t just an optimization—it&rsquo;s becoming a necessity.</p>
 
 
 
