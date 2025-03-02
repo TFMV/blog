@@ -28,7 +28,7 @@ Reading a massive text file line by line? Slow. Parsing strings with `strings.Sp
 
 Clearly, I needed something better.
 
-## Optimizing for Speed: The Real Fun Begins
+## V1: First Round of Optimizations
 
 At this point, I knew I had to rethink the whole approach. Here's what I ended up doing:
 
@@ -85,30 +85,69 @@ measurement, err := ParseFloat(line[sepIdx+1:])
 
 No extra allocations. No garbage collection overhead.
 
-## The Final Results
+## V1 Results: Getting Closer
 
-After all these optimizations, here's how fast I managed to get it:
+After these optimizations, I got the processing time down to about 14.79 seconds for a billion rows. Not bad, but I knew we could do better.
 
-```bash
-File opened with mmap in: 40.292µs
-File size: 8793.81 MB
-Using 10 CPU cores
-Processing file in 1100 batches of ~8 MB each
-Workers initialized in: 17.625µs
-Reading complete: 1100 batches in 14.716501416s
-All 1100 result batches processed in 14.777454417s
-Output formatted for 180 stations in: 128.375µs
-Total processing time: 14.777804084s
-Challenge completed in: 14.792802708s
+## V2: Breaking the Speed Barrier
+
+The journey to sub-4-second processing required even more aggressive optimizations:
+
+### 1. Integer-Based Temperature Storage
+
+Instead of using floats, we store temperatures as int16 with an implied decimal point. This not only saves memory but also makes calculations much faster.
+
+### 2. Fixed-Size Buffers
+
+We pre-allocate fixed-size buffers for station names, eliminating dynamic allocations during processing:
+
+```go
+type stationName struct {
+    hashVal uint32
+    byteLen int
+    name    [MaxLineLength]byte
+}
 ```
 
-**14.79 seconds for a billion rows.**
+### 3. Larger Batch Sizes
 
-Not bad.
+We increased the batch size to 256MB, which significantly improved I/O throughput:
+
+```go
+const BatchSizeBytes = 256 * 1024 * 1024 // 256 MB
+```
+
+### 4. Branchless Temperature Parsing
+
+We rewrote the temperature parsing to be as branchless as possible, making it more CPU-cache friendly.
+
+### 5. Lock-Free Processing
+
+By carefully designing our data structures, we eliminated the need for locks in our parallel processing pipeline.
+
+## The Final Results: Breaking Records
+
+The V2 implementation achieved something remarkable:
+
+```bash
+=== Benchmark Summary ===
+Total Processing Time: 3.35 seconds
+Throughput: 298.16 million rows/second
+Memory Used: 516.91 MB
+Number of CPUs: 10
+Batch Size: 256 MB
+=====================
+```
+
+**3.35 seconds for a billion rows.** That's a 77% improvement over V1!
 
 ## Lessons Learned
 
-- **Memory mapping is a game-changer.** Don't read line-by-line if you can avoid it.
-- **Goroutines help, but synchronization is key.** If you're not careful, concurrency overhead will eat all your gains.
-- **String parsing is a hidden bottleneck.** Avoid unnecessary allocations wherever possible.
-- **Hash tables can make or break performance.** Go's built-in map is great, but custom solutions can be faster for specialized use cases.
+1. **Memory efficiency is king.** Fixed-size buffers and integer math made a huge difference.
+2. **Batch size matters.** Larger batches meant better I/O throughput.
+3. **Avoid branches.** CPU branch prediction is expensive; eliminate branches where possible.
+4. **Know your hardware.** Understanding CPU cache lines and memory alignment paid off.
+5. **Sometimes unsafe is necessary.** Strategic use of unsafe operations can yield significant performance gains.
+6. **Measure, don't guess.** Every optimization was validated with benchmarks.
+
+The journey from 14.79 seconds to 3.35 seconds shows that there's always room for optimization when you're willing to dig deep enough into the problem. It's not just about writing faster code—it's about understanding the entire stack, from the hardware up.
