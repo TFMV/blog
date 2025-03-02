@@ -1,14 +1,20 @@
 # Blog, Thomas F McGeehan V
 
-## Exploring Ideas, Technology, and Beyond  
+## Systems, Intelligence & the Stories We Tell
 
-Welcome to the personal blog of **Thomas F McGeehan V**, where I write about **architecture, databases, Apache Arrow, Go, data engineering, and anything else that sparks curiosity**. This blog is a space for deep dives, creative musings, and technical explorations.
+Welcome to my personal & technical blog, where I explore the evolving intersections of data, AI, high-performance computing, and human cognition.
+
+Expect deep dives, hands-on experiments, and unconventional insights—from database internals and Apache Arrow to AI’s impact on how we think and create.
+
+Some posts are about Go, emerging databases, and performance optimization. Others challenge how we interact with technology, how AI shapes thought, and where creativity meets engineering.
+
+And sometimes, I just write poetry.
 
 ---
 
 ## 📌 Latest Posts  
 
-### [Arrow Flight: The Future of Data Transfer](blog-posts/flight.md)
+### [Arrow Flight](blog-posts/flight.md)
 
 How Apache Arrow Flight revolutionizes high-speed data exchange and what it means for modern data pipelines.
 
@@ -16,14 +22,9 @@ How Apache Arrow Flight revolutionizes high-speed data exchange and what it mean
 
 ## 🔗 Connect with Me  
 
-Want to chat about **data, performance, or your next big idea**?  
 Find me here:  
 
 - 🏗 **GitHub:** [TFMV](https://github.com/TFMV)  
 - 💼 **LinkedIn:** [TFMV](https://www.linkedin.com/in/TFMV)  
 
 ---
-
-## 📢 Stay Tuned  
-
-More articles and deep dives are on the way. If you’re interested in **modern data systems, high-performance computing, or just seeing where my curiosity takes me**, bookmark this page!
