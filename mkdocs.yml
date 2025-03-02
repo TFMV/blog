@@ -36,6 +36,7 @@ nav:
       - Go and Arrow: blog-posts/go-arrow.md
       - The Unilateral Bond: blog-posts/unilateral-bond.md
       - Quiver: blog-posts/quiver.md
+      - Billion: blog-posts/billion.md
 
 plugins:
   - search
