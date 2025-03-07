@@ -356,13 +356,14 @@ At its heart, Quiver combines blazing-fast HNSW indexing with structured metadat
 
 #### 🔍 Vector Search Engine
 
-go
+```go
 type Index struct {
     hnsw     *hnswgo.HnswIndex    // HNSW for vector search
     metadata map[uint64]interface{} // Fast metadata access
     db*sql.DB              // DuckDB for structured queries
     cache    sync.Map             // High-performance metadata cache
 }
+```
 
 - **HNSW Implementation**: Optimized C++ core with Go bindings
 - **Dual Distance Metrics**: Cosine similarity and L2 (Euclidean)
@@ -373,10 +374,11 @@ type Index struct {
 
 - **Batch Processing**
 
-go
+```go
   // Automatic batching for high-throughput ingestion
   batchBuffer []vectorMeta
   batchTicker *time.Ticker
+```
 
 - Background vector batching
 - Configurable flush intervals
@@ -389,13 +391,14 @@ go
 
 #### 🏹 Arrow Integration
 
-go
+```go
 // Native Arrow support for efficient data loading
 func (idx *Index) AppendFromArrow(rec arrow.Record) error {
     // Direct zero-copy ingestion from Arrow
     // Optimized batch processing
     // Type-safe schema validation
 }
+```
 
 #### 💾 Storage Engine
 
@@ -407,13 +410,14 @@ func (idx *Index) AppendFromArrow(rec arrow.Record) error {
 
 - **Persistence Layer**
 
-go
+```go
   // Efficient save/load operations
   func (idx *Index) Save(path string) error {
       // Memory-mapped index persistence
       // Atomic metadata updates
       // Crash-safe operations
   }
+```
 
 #### 🛡️ Production Safeguards
 
