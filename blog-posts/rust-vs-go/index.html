@@ -1,0 +1,1338 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal blog by Thomas F McGeehan V">
+      
+      
+        <meta name="author" content="Thomas F McGeehan V">
+      
+      
+        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/rust-vs-go/">
+      
+      
+        <link rel="prev" href="../quiver/">
+      
+      
+        <link rel="next" href="../unilateral-bond/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.6">
+    
+    
+      
+        <title>Rust vs Go - Blog - Thomas F McGeehan V</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Rust vs Go - Blog - Thomas F McGeehan V" >
+      
+        <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
+      
+        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/rust-vs-go.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/rust-vs-go/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Rust vs Go - Blog - Thomas F McGeehan V" >
+      
+        <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
+      
+        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/rust-vs-go.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#rust-vs-go-two-roads-one-destination" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Blog - Thomas F McGeehan V" class="md-header__button md-logo" aria-label="Blog - Thomas F McGeehan V" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Blog - Thomas F McGeehan V
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Rust vs Go
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TFMV/blog" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../arrow-ecosystem/" class="md-tabs__link">
+          
+  
+    
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Blog - Thomas F McGeehan V" class="md-nav__button md-logo" aria-label="Blog - Thomas F McGeehan V" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Blog - Thomas F McGeehan V
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TFMV/blog" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../arrow-ecosystem/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Arrow Ecosystem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flight/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Arrow Flight
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../billion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Billion
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../go-arrow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Go and Arrow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time-machine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Living Databases
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pygomo/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mojo is Fast
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quiver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quiver
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Rust vs Go
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../unilateral-bond/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The Unilateral Bond
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fs-hacker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Walking the Filesystem like a Hacker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="rust-vs-go-two-roads-one-destination">Rust vs. Go: Two Roads, One Destination<a class="headerlink" href="#rust-vs-go-two-roads-one-destination" title="Permanent link">#</a></h1>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
+<p>I&rsquo;ve been here before. New languages, new paradigms, new promises.</p>
+<p>Go. Rust. Both have carved their names into modern backend development.</p>
+<p>Go keeps it simple. Fast compiles. Lightweight concurrency. Batteries included. It was built at Google for a reason—scale matters.</p>
+<p>Rust is a different beast. Zero-cost abstractions. Borrow checker. Fearless concurrency. It wasn&rsquo;t built to move fast—it was built to move right.</p>
+<p>Two tools. Two philosophies. One question.</p>
+<p>Which road do you take?</p>
+<h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">#</a></h2>
+<h3 id="cpu-bound-tasks">CPU-bound Tasks<a class="headerlink" href="#cpu-bound-tasks" title="Permanent link">#</a></h3>
+<p>Rust runs hot. Zero-cost abstractions. Bare-metal efficiency. No garbage collector breathing down its neck. It was built for performance, and it shows.</p>
+<p>Benchmarks don&rsquo;t lie.</p>
+<ul>
+<li>The Computer Language Benchmarks Game? Rust beats Go across the board in computation-heavy tasks.</li>
+<li>Regex processing? Binary trees? Rust slices through them faster and with less memory.</li>
+<li>Real-world servers? A 2024 test at Evrone put Rust&rsquo;s Actix Web head-to-head with Go. Rust delivered 1.5× the throughput, thanks to its ahead-of-time optimizations and lack of GC overhead.</li>
+</ul>
+<p>Go isn&rsquo;t slow. It&rsquo;s just optimized for a different battle.</p>
+<ul>
+<li>Fast compilation.</li>
+<li>Reasonable performance.</li>
+<li>Concurrency that&rsquo;s hard to beat.</li>
+<li>But when the bottleneck is raw CPU efficiency, Rust takes the crown. Algorithm-heavy workloads. High-frequency trading. Heavy data processing. If you need every last ounce of speed, Rust gives it to you—without compromise.</li>
+</ul>
+<h3 id="memory-usage">Memory Usage<a class="headerlink" href="#memory-usage" title="Permanent link">#</a></h3>
+<p>Rust plays it tight. No garbage collector. No unpredictable pauses. Just raw ownership and scope-based memory management. Every byte has a purpose.</p>
+<p>Go takes the opposite approach. Garbage collection. Automatic memory management. Developer simplicity at the cost of occasional hiccups.</p>
+<ul>
+<li>Benchmarks tell the story—Rust often uses less memory than Go for the same tasks. Memory is freed the moment it goes out of scope, keeping the footprint small and predictable.</li>
+<li>Go keeps things simple, but at a cost. Memory isn&rsquo;t reclaimed right away. The GC runs when it needs to—not when you want it to.</li>
+<li>Ask Discord. They ran a Go service and saw latency spikes every two minutes. The culprit? Garbage collection pauses. When they rewrote it in Rust, the problem vanished. No GC, no surprise pauses.</li>
+</ul>
+<p>Go&rsquo;s memory model works until it doesn&rsquo;t. Goroutines use dynamically growing stacks. The heap expands to optimize GC efficiency. It&rsquo;s all designed to keep development smooth—but smooth isn&rsquo;t always fast.</p>
+<p>Rust demands more from its developers. No hidden memory magic, no safety net. But in return? Efficient, stable, and predictable performance.</p>
+<h3 id="concurrency">Concurrency<a class="headerlink" href="#concurrency" title="Permanent link">#</a></h3>
+<h4 id="fire-and-forget-vs-precision-control">Fire-and-Forget vs. Precision Control<a class="headerlink" href="#fire-and-forget-vs-precision-control" title="Permanent link">#</a></h4>
+<p>Go keeps it simple. Goroutines. Channels. Built-in, no fuss. Want concurrency? Just slap <code>go</code> in front of a function call. The runtime takes care of the rest.</p>
+<p>Rust makes you work for it. No green threads. No default runtime. You pick your tool—async tasks, OS threads, channels, locks.</p>
+<ul>
+<li><strong>Go is effortless</strong>. Goroutines are lightweight, scheduled automatically, and scale across OS threads with minimal friction. Need a new task? The runtime handles it.</li>
+<li><strong>Rust demands precision</strong>. Async tasks don&rsquo;t just run—you need an executor (<code>tokio::spawn</code>, <code>async-std</code>). You control every aspect of execution.</li>
+</ul>
+<h4 id="preemptive-vs-cooperative">Preemptive vs. Cooperative<a class="headerlink" href="#preemptive-vs-cooperative" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Go&rsquo;s goroutines</strong> are preemptively scheduled. The runtime steps in if a goroutine hogs CPU. No goroutine can hold everything hostage.</li>
+<li><strong>Rust&rsquo;s async tasks</strong> cooperate. They run until they hit an <code>.await</code>. A badly written async task that never yields? It starves everything else.</li>
+</ul>
+<h4 id="performance-trade-offs">Performance Trade-offs<a class="headerlink" href="#performance-trade-offs" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Go&rsquo;s model</strong> is a one-size-fits-all approach. It&rsquo;s great for network services, where each request gets a goroutine and the scheduler juggles them efficiently.</li>
+<li><strong>Rust async</strong> compiles to state-machine objects. No scheduling overhead, just function calls into an executor. In the right hands, this is absurdly efficient for I/O-heavy workloads.</li>
+</ul>
+<h4 id="safety-vs-simplicity">Safety vs. Simplicity<a class="headerlink" href="#safety-vs-simplicity" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Go&rsquo;s goroutines</strong> and shared memory model make things easy, but they don&rsquo;t stop race conditions. It&rsquo;s up to you to manage locks and channels properly. There&rsquo;s a race detector (<code>-race</code> flag), but it only helps if you remember to run it.</li>
+<li><strong>Rust enforces</strong> &ldquo;fearless concurrency&rdquo; at compile time. Data races? Impossible in safe code. Try to share mutable state incorrectly, and the compiler flat-out refuses to build.</li>
+</ul>
+<h4 id="the-reality">The Reality<a class="headerlink" href="#the-reality" title="Permanent link">#</a></h4>
+<p>Go makes concurrent programming effortless. It&rsquo;s perfect for web servers, distributed systems, and anything where I/O concurrency matters.</p>
+<p>Rust gives you control. If you need predictable latency, zero scheduling overhead, and absolute performance tuning, you put in the work, and Rust delivers.</p>
+<ul>
+<li>Concurrency in Go is fast, simple, and correct enough.</li>
+<li>Concurrency in Rust is fast, safe, and as correct as you make it.</li>
+</ul>
+<p>Choose your pain.</p>
+<h2 id="safety-and-reliability">Safety and Reliability<a class="headerlink" href="#safety-and-reliability" title="Permanent link">#</a></h2>
+<p>Rust protects you from yourself. Go trusts you to drive safely.</p>
+<h3 id="compiler-as-guardian-vs-runtime-as-safety-net">Compiler as Guardian vs. Runtime as Safety Net<a class="headerlink" href="#compiler-as-guardian-vs-runtime-as-safety-net" title="Permanent link">#</a></h3>
+<p>Rust doesn&rsquo;t just aim for safety—it demands it. The borrow checker, the ownership model, the compiler&rsquo;s unwavering discipline—all of it exists to catch bugs before your code even runs.</p>
+<ul>
+<li><strong>Memory safety?</strong> Built in. No null pointers. No buffer overflows. No use-after-free. If it compiles, it&rsquo;s solid.</li>
+<li><strong>Concurrency safety?</strong> Mandatory. If you don&rsquo;t explicitly handle thread safety, the compiler shuts you down.</li>
+</ul>
+<p>Go takes a lighter approach. You get garbage collection instead of manual memory management. You don&rsquo;t need to track ownership or deal with lifetimes. That means faster development, fewer headaches—until a bug sneaks through.</p>
+<ul>
+<li><strong>Race conditions?</strong> Go doesn&rsquo;t prevent them; it assumes you&rsquo;ll check for them. The <code>-race</code> flag helps catch them, but only if you use it.</li>
+<li><strong>Error handling?</strong> Go won&rsquo;t force you to handle errors. Errors are values, and it&rsquo;s up to you to check them. Miss one? That&rsquo;s on you.</li>
+</ul>
+<h3 id="reliability-in-the-real-world">Reliability in the Real World<a class="headerlink" href="#reliability-in-the-real-world" title="Permanent link">#</a></h3>
+<p>Rust&rsquo;s strictness pays off long-term. Once it compiles, it tends to work. Refactoring is a dream—the compiler won&rsquo;t let you introduce subtle breakages. One developer put it best: &ldquo;Rust is S-tier for refactoring. You don&rsquo;t break things by accident.&rdquo;</p>
+<p>Go&rsquo;s reliability comes from simplicity. Fewer language features mean fewer surprises. Code stays clean, predictable, and maintainable—as long as you follow best practices.</p>
+<h3 id="a-matter-of-trust">A Matter of Trust<a class="headerlink" href="#a-matter-of-trust" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Rust</strong> is the overprotective parent—&ldquo;You&rsquo;re not leaving the house until I know you&rsquo;re safe.&rdquo;</li>
+<li><strong>Go</strong> is the easygoing mentor—&ldquo;You&rsquo;ll learn by doing. Just don&rsquo;t crash the car.&rdquo;</li>
+</ul>
+<p>If your system must be bulletproof—financial systems, security-sensitive backends, high-performance infrastructure—Rust is your safety net.</p>
+<p>If you want to ship quickly, iterate easily, and handle reliability through testing and best practices—Go is your best friend.</p>
+<p>Both can get you to the finish line. One just makes sure you don&rsquo;t veer off the road.</p>
+<h2 id="developer-experience">Developer Experience<a class="headerlink" href="#developer-experience" title="Permanent link">#</a></h2>
+<h3 id="tooling">Tooling<a class="headerlink" href="#tooling" title="Permanent link">#</a></h3>
+<p>Rust hands you a precision toolkit—built for power, built for control. Go hands you a wrench and says, &lsquo;That&rsquo;ll do.&rsquo;</p>
+<p>Both Rust and Go have top-tier tooling, but their philosophies couldn&rsquo;t be more different. Rust&rsquo;s approach is feature-rich, integrated, and meticulous. Go&rsquo;s is fast, minimal, and pragmatic.</p>
+<h4 id="rust-the-full-arsenal">Rust: The Full Arsenal<a class="headerlink" href="#rust-the-full-arsenal" title="Permanent link">#</a></h4>
+<p>Rust spoils you with Cargo. One tool does it all:</p>
+<ul>
+<li>Builds your project (<code>cargo build</code>).</li>
+<li>Manages dependencies (<code>cargo add</code>, <code>cargo update</code>).</li>
+<li>Runs tests (<code>cargo test</code>).</li>
+<li>Formats your code (<code>cargo fmt</code>).</li>
+<li>Checks for common pitfalls (<code>cargo clippy</code>).</li>
+<li>Even generates documentation (<code>cargo doc</code>).</li>
+</ul>
+<p>It&rsquo;s structured, powerful, and opinionated—a developer&rsquo;s safety net. Rust-analyzer gives first-class IDE support with auto-completions, type hints, and inline errors. The compiler? A ruthless teacher—but one that explains exactly what went wrong and how to fix it.</p>
+<p>The catch? Compilation speed. Rust does a lot of thinking before it runs your code. Borrow-checking, optimizations, safety guarantees—it all takes time. Big projects can take minutes to compile. Rust&rsquo;s incremental compilation helps, but Go will always be faster here.</p>
+<h4 id="go-built-for-speed">Go: Built for Speed<a class="headerlink" href="#go-built-for-speed" title="Permanent link">#</a></h4>
+<p>Go keeps things dead simple. The <code>go</code> command is lean and fast—no fancy build systems, no configuration nightmares:</p>
+<ul>
+<li><code>go build</code> – Compiles instantly.</li>
+<li><code>go test</code> – Runs all tests.</li>
+<li><code>go fmt</code> – No debates about style.</li>
+<li><code>go mod</code> – Manages dependencies effortlessly.</li>
+</ul>
+<p>And here&rsquo;s the kicker: Go compiles at lightning speed. A large Go project? Compiles in seconds. That&rsquo;s a game-changer for rapid iteration.</p>
+<p>But the trade-off? Less built-in help. Go won&rsquo;t lint your code for best practices by default. It won&rsquo;t warn you about unhandled errors unless you explicitly check them. The tools are efficient, but hands-off. You&rsquo;re expected to know what you&rsquo;re doing.</p>
+<h4 id="testing-debugging">Testing &amp; Debugging<a class="headerlink" href="#testing-debugging" title="Permanent link">#</a></h4>
+<p>Both Rust and Go ship with a built-in test framework, but Rust&rsquo;s feels more complete:</p>
+<ul>
+<li>Rust&rsquo;s <code>#[test]</code> annotations make it easy to define unit tests.</li>
+<li><code>cargo test</code> runs everything by default.</li>
+<li>Rust&rsquo;s assertions (<code>assert!</code>, <code>assert_eq!</code>) fail loudly and clearly.</li>
+<li>Benchmarking is built into Cargo.</li>
+</ul>
+<p>Go takes a simpler approach:</p>
+<ul>
+<li><code>go test</code> automatically finds and runs test files.</li>
+<li>Go&rsquo;s error-checking is explicit—no exceptions, just return values.</li>
+<li>Race conditions? <code>go test -race</code> helps, but it&rsquo;s not mandatory.</li>
+</ul>
+<p>Both languages prioritize correctness, but Rust forces it while Go encourages it.</p>
+<h4 id="the-trade-off-control-vs-speed">The Trade-Off: Control vs. Speed<a class="headerlink" href="#the-trade-off-control-vs-speed" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Rust&rsquo;s tooling</strong> is comprehensive, structured, and packed with guardrails.</li>
+<li><strong>Go&rsquo;s tooling</strong> is minimal, fast, and built for iteration.</li>
+</ul>
+<p>Want depth, rigor, and long-term maintainability? Rust gives you the full armory.<br />
+Want simplicity, speed, and &ldquo;just get it done&rdquo; development? Go keeps it lean and mean.</p>
+<p>One gives you a guided tour. The other hands you a map and a compass. Both get you there.</p>
+<h3 id="learning-curve">Learning Curve<a class="headerlink" href="#learning-curve" title="Permanent link">#</a></h3>
+<p>Go is an open road. Rust is a mountain climb.</p>
+<h4 id="go-fast-simple-and-ready-to-roll">Go: Fast, Simple, and Ready to Roll<a class="headerlink" href="#go-fast-simple-and-ready-to-roll" title="Permanent link">#</a></h4>
+<p>Go was built to be easy to pick up and hard to mess up.</p>
+<ul>
+<li><strong>Minimalist syntax</strong> – no surprises, no magic.</li>
+<li><strong>No manual memory management</strong> – garbage collection takes care of it.</li>
+<li><strong>No metaprogramming madness</strong> – just functions, structs, and interfaces.</li>
+</ul>
+<p>A competent developer can learn Go in a weekend and be productive in a week. The official Go spec fits in a single book – an intentional design choice. There are no lifetimes, ownership rules, or complex generics to wrestle with. You just write code, and it runs.</p>
+<p>That simplicity is Go&rsquo;s biggest strength. New hires ramp up quickly, and teams move fast. Go is &ldquo;boring&rdquo; in the best way possible – predictable, readable, and pragmatic.</p>
+<h4 id="rust-a-steep-climb-with-a-view">Rust: A Steep Climb With a View<a class="headerlink" href="#rust-a-steep-climb-with-a-view" title="Permanent link">#</a></h4>
+<p>Rust doesn&rsquo;t hand you the keys and say &lsquo;good luck.&rsquo; It makes you earn them.</p>
+<ul>
+<li><strong>Ownership and borrowing</strong> – powerful, but a mental shift.</li>
+<li><strong>Lifetimes and type safety</strong> – no footguns, but plenty of compiler fights.</li>
+<li><strong>Explicit concurrency models</strong> – safe, but no free goroutines.</li>
+</ul>
+<p>At first, Rust feels like wrestling the borrow checker. Every beginner hits compiler errors that seem cryptic. But those errors are lessons – Rust won&rsquo;t let you write unsafe or race-prone code.</p>
+<p>It takes time. But once you internalize Rust&rsquo;s rules, something clicks. The reward? Fearless refactoring. Bulletproof performance. No garbage collection pauses.</p>
+<p>Rust&rsquo;s tooling softens the blow – <code>cargo check</code> catches issues before full compilation, rust-analyzer makes coding smoother, and the community has great resources (The Rust Book, Rustlings, etc.).</p>
+<h4 id="team-productivity-maintainability">Team Productivity &amp; Maintainability<a class="headerlink" href="#team-productivity-maintainability" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Go wins on onboarding</strong>. A new dev can read a Go codebase and understand it quickly. Rust&rsquo;s explicitness is great for correctness, but a macro-heavy or generic-heavy Rust project can be intimidating.</li>
+<li><strong>Rust wins on long-term maintenance</strong>. You may struggle at first, but Rust prevents entire classes of runtime bugs. When you refactor, if it compiles, it probably works.</li>
+<li><strong>Go&rsquo;s simplicity helps readability</strong>. There&rsquo;s only one way to do most things. Rust&rsquo;s expressiveness gives power but also variety – one Rust project might look very different from another.</li>
+</ul>
+<h4 id="final-verdict-short-term-vs-long-term-investment">Final Verdict: Short-Term vs. Long-Term Investment<a class="headerlink" href="#final-verdict-short-term-vs-long-term-investment" title="Permanent link">#</a></h4>
+<ul>
+<li>Need to ship quickly with a team that&rsquo;s new to the language? Pick Go.</li>
+<li>Need rock-solid correctness and long-term maintainability? Rust pays off.</li>
+</ul>
+<p>Go gets out of your way and lets you build fast.<br />
+Rust forces you to think and rewards you with unshakable stability.</p>
+<p>Both roads lead somewhere great—it just depends on how much work you&rsquo;re willing to put in before you get there.</p>
+<h3 id="community-support">Community Support<a class="headerlink" href="#community-support" title="Permanent link">#</a></h3>
+<p>Rust and Go both have strong, thriving communities—but they differ in culture, engagement, and focus.</p>
+<h4 id="rust-the-passionate-and-welcoming-tribe">Rust: The Passionate and Welcoming Tribe<a class="headerlink" href="#rust-the-passionate-and-welcoming-tribe" title="Permanent link">#</a></h4>
+<p>Rust&rsquo;s community isn&rsquo;t just active—it&rsquo;s fiercely devoted and intentionally inclusive.</p>
+<ul>
+<li><strong>A culture of mentorship</strong> – Rustaceans go out of their way to help newcomers.</li>
+<li><strong>Extensive learning materials</strong> – The Rust Book, Rustlings, Rust by Example, and thousands of blog posts and tutorials.</li>
+<li><strong>Highly engaged forums &amp; Discord</strong> – Questions rarely go unanswered.</li>
+</ul>
+<p>Rust&rsquo;s maintainers have built a community-first culture from day one, enforcing a Code of Conduct and fostering an environment where even beginners feel comfortable participating.</p>
+<p>Crates.io, Rust&rsquo;s package ecosystem, is massive (100,000+ crates) and community-driven. Because Rust&rsquo;s standard library is small, developers rely on the ecosystem for functionality—but in return, the Rust community takes crate maintenance seriously.</p>
+<p>Rust also enjoys a loyal developer base. For seven years running, Rust has topped Stack Overflow&rsquo;s &ldquo;Most Loved Language&rdquo; survey. Once developers invest in Rust, they rarely want to leave.</p>
+<h4 id="go-practical-industry-tested-and-efficient">Go: Practical, Industry-Tested, and Efficient<a class="headerlink" href="#go-practical-industry-tested-and-efficient" title="Permanent link">#</a></h4>
+<p>Go&rsquo;s community is just as strong—but in a different way.</p>
+<ul>
+<li><strong>Built by engineers, for engineers</strong> – Google, Uber, Cloudflare, and others have heavily documented best practices.</li>
+<li><strong>A wealth of industry experience</strong> – Go has powered cloud-native infrastructure for over a decade.</li>
+<li><strong>Pragmatic support channels</strong> – Gophers Slack, Stack Overflow, and Go mailing lists focus on solving real-world problems.</li>
+</ul>
+<p>Go&rsquo;s culture is engineering pragmatism. Developers don&rsquo;t just love Go—they use it to get things done.</p>
+<p>Unlike Rust, which depends on third-party libraries, Go&rsquo;s standard library is extensive and well-maintained by the core team. This makes it easy to find solutions in official documentation rather than relying on community crates.</p>
+<p>Go also has a larger user base (as of recent surveys, 11% of backend developers use Go vs. 5% for Rust). This means more real-world experience, more production-ready insights, and faster answers to common problems.</p>
+<h4 id="industry-support-growth">Industry Support &amp; Growth<a class="headerlink" href="#industry-support-growth" title="Permanent link">#</a></h4>
+<p>Both Rust and Go are not just languages—they&rsquo;re investments. Big players in tech have put serious weight behind them, ensuring their long-term viability.</p>
+<ul>
+<li><strong>Rust</strong> has funding and support from Microsoft, Amazon, Meta, and previously Mozilla. It&rsquo;s gaining traction in systems programming, security, and performance-critical applications, with major enterprises looking to replace legacy C++ code.</li>
+<li><strong>Go</strong> is deeply embedded in Google, Kubernetes, and cloud-native development. It remains the go-to language for scalable web services, infrastructure tooling, and microservices.</li>
+</ul>
+<p>Go owns the cloud, but Rust is breaking into performance-driven industries like embedded systems, financial services, and operating systems.</p>
+<p>While Go has the larger industry footprint today, Rust&rsquo;s adoption is accelerating—especially as companies seek safer, more performant alternatives to C++ and Python. The industry is watching closely, and Rust&rsquo;s momentum is impossible to ignore.</p>
+<h2 id="ecosystem-and-libraries">Ecosystem and Libraries<a class="headerlink" href="#ecosystem-and-libraries" title="Permanent link">#</a></h2>
+<p>Both Rust and Go provide rich ecosystems for backend development, but they take different paths in how they structure libraries, community contributions, and standard tools.</p>
+<h3 id="go-a-mature-cloud-native-powerhouse">Go: A Mature, Cloud-Native Powerhouse<a class="headerlink" href="#go-a-mature-cloud-native-powerhouse" title="Permanent link">#</a></h3>
+<p>Go&rsquo;s ecosystem is highly mature and deeply embedded in web, networking, and cloud-native development. It has been the go-to language for scalable backend services for over a decade.</p>
+<ul>
+<li><strong>A &ldquo;Batteries-Included&rdquo; Standard Library</strong> – Go&rsquo;s standard library does most of the heavy lifting for backend tasks. HTTP servers, JSON encoding/decoding, SQL database drivers, cryptography—many of the things you&rsquo;d need a third-party library for in other languages are built-in. You can launch a web server with just <code>net/http</code>, no extra dependencies required.</li>
+<li><strong>Battle-Tested Web Frameworks</strong> – Frameworks like Gin, Echo, Fiber, and Beego make Go&rsquo;s web development even more ergonomic, offering routing, middleware, and performance optimizations.</li>
+<li><strong>Cloud &amp; DevOps Leadership</strong> – If it runs the cloud, there&rsquo;s a good chance it&rsquo;s written in Go. Kubernetes, Docker, Prometheus, Terraform—all core tools of modern cloud infrastructure are built in Go.</li>
+<li><strong>First-Class Networking Support</strong> – From gRPC (official gRPC-Go) to GraphQL (gqlgen), Go provides first-class support for networked services and microservices.</li>
+</ul>
+<p>Go&rsquo;s ecosystem is mature, production-ready, and optimized for web-scale applications. You&rsquo;ll find high-quality, well-maintained libraries for almost any backend use case, especially in DevOps, cloud services, and microservices architectures.</p>
+<h3 id="rust-a-rapidly-expanding-powerhouse">Rust: A Rapidly Expanding Powerhouse<a class="headerlink" href="#rust-a-rapidly-expanding-powerhouse" title="Permanent link">#</a></h3>
+<p>Rust&rsquo;s ecosystem started in systems programming, but over the past few years, it has exploded into backend development. While it lacks Go&rsquo;s long-standing dominance in web services, Rust&rsquo;s ecosystem is rapidly catching up—and in many ways, surpassing it in performance and safety.</p>
+<ul>
+<li><strong>Web Frameworks with Blazing Speed</strong> – Rust offers high-performance web frameworks like Actix Web (one of the fastest in any language), Axum (async-first, built on Tokio), and Rocket (ergonomic, macro-powered).</li>
+<li><strong>Async Ecosystem Built for Scale</strong> – Tokio powers Rust&rsquo;s async ecosystem, providing an ultra-fast networking runtime. With Hyper (HTTP), Tonic (gRPC), and Mio (low-level I/O), Rust delivers high-performance, low-latency networked services.</li>
+<li><strong>Compile-Time Safe Database Access</strong> – Rust offers powerful database libraries like Diesel (compile-time checked ORM) and sqlx (async, type-safe SQL queries). Unlike Go, Rust&rsquo;s database queries can be validated at compile time, eliminating entire classes of runtime SQL errors.</li>
+<li><strong>Cutting-Edge Serialization</strong> – Serde is Rust&rsquo;s secret weapon for JSON (and more). It compiles serialization logic at compile time, meaning no runtime reflection overhead—one of the reasons Rust often outperforms Go in JSON handling.</li>
+</ul>
+<p>Rust&rsquo;s backend ecosystem may be newer than Go&rsquo;s, but it&rsquo;s growing at an astonishing pace. While some libraries are still maturing, core components like Tokio, Hyper, and Actix Web are already battle-tested in production.</p>
+<h3 id="ecosystem-showdown-head-to-head">Ecosystem Showdown: Head-to-Head<a class="headerlink" href="#ecosystem-showdown-head-to-head" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Go (Mature &amp; Cloud-Optimized)</th>
+<th>Rust (High-Performance &amp; Safety-Focused)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web Frameworks</td>
+<td>Gin, Echo, Fiber, Beego</td>
+<td>Actix Web, Axum, Rocket</td>
+</tr>
+<tr>
+<td>Concurrency</td>
+<td>Goroutines, channels, sync primitives (built-in)</td>
+<td>Async/Await (Tokio, async-std), message passing</td>
+</tr>
+<tr>
+<td>Database Access</td>
+<td>database/sql + drivers, GORM (ORM)</td>
+<td>Diesel (compile-time safe), sqlx (async queries)</td>
+</tr>
+<tr>
+<td>Serialization</td>
+<td>encoding/json (reflection-based)</td>
+<td>Serde (compile-time optimized, zero-cost abstraction)</td>
+</tr>
+<tr>
+<td>Cloud &amp; DevOps</td>
+<td>Kubernetes, Docker, Terraform, Prometheus</td>
+<td>Emerging cloud tooling, AWS SDK, Kubernetes client (kube-rs)</td>
+</tr>
+<tr>
+<td>Networking</td>
+<td>gRPC-Go, gqlgen (GraphQL), HTTP2/3 support</td>
+<td>Hyper (HTTP), Tonic (gRPC), Warp, Mio (low-level async I/O)</td>
+</tr>
+<tr>
+<td>Ecosystem Maturity</td>
+<td>Stable, industry-standard</td>
+<td>Rapidly growing, cutting-edge performance</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-big-picture-stability-vs-innovation">The Big Picture: Stability vs. Innovation<a class="headerlink" href="#the-big-picture-stability-vs-innovation" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Go&rsquo;s ecosystem</strong> is built for reliability—a battle-tested language with an established web/cloud ecosystem, making it one of the best choices for web services today.</li>
+<li><strong>Rust&rsquo;s ecosystem</strong> is built for raw speed and correctness—it&rsquo;s expanding quickly, and for performance-sensitive applications (especially async/networking-heavy ones), Rust is starting to edge ahead.</li>
+</ul>
+<p>Both languages have strong library support for backend work. Go dominates cloud-native infrastructure and is easier to adopt, while Rust provides unparalleled safety, zero-cost abstractions, and extreme performance.</p>
+<p>If you want fast and simple development, Go&rsquo;s ecosystem is hard to beat.<br />
+If you want maximal performance, safety, and long-term maintainability, Rust&rsquo;s ecosystem is the future.</p>
+<h2 id="real-world-use-cases">Real-world Use Cases<a class="headerlink" href="#real-world-use-cases" title="Permanent link">#</a></h2>
+<p>Both Rust and Go have carved out strongholds in different industries. While Go has long been a dominant force in cloud infrastructure and web services, Rust is making huge strides in high-performance and safety-critical applications. Some companies even use both—Go for scalable services, Rust for performance-sensitive components.</p>
+<h3 id="go-in-the-wild-the-backbone-of-the-cloud">Go in the Wild: The Backbone of the Cloud<a class="headerlink" href="#go-in-the-wild-the-backbone-of-the-cloud" title="Permanent link">#</a></h3>
+<p>Go was born in Google, and it has since become a staple of modern cloud infrastructure. If you&rsquo;re using cloud services, you&rsquo;re using Go-powered software—whether you realize it or not.</p>
+<h4 id="cloud-infrastructure-devops">🔹 Cloud Infrastructure &amp; DevOps<a class="headerlink" href="#cloud-infrastructure-devops" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Kubernetes, Docker, Prometheus, Terraform</strong>—Go powers nearly every major cloud-native tool.</li>
+<li><strong>HashiCorp&rsquo;s Vault</strong> (secrets management) and <strong>Consul</strong> (service mesh) are built in Go.</li>
+<li><strong>Cloudflare</strong> uses Go to build scalable, high-performance edge services.</li>
+</ul>
+<h4 id="enterprise-microservices">🔹 Enterprise &amp; Microservices<a class="headerlink" href="#enterprise-microservices" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Uber</strong> runs high-QPS (queries per second) microservices in Go (e.g., geofencing/mapping).</li>
+<li><strong>Netflix</strong> uses Go for backend services and data processing pipelines.</li>
+<li><strong>Dropbox</strong> migrated critical backend services from Python to Go for better performance.</li>
+</ul>
+<h4 id="financial-payment-services">🔹 Financial &amp; Payment Services<a class="headerlink" href="#financial-payment-services" title="Permanent link">#</a></h4>
+<ul>
+<li>Fintech and payment processors adopt Go for fast, efficient transaction processing.</li>
+<li>Go&rsquo;s memory safety (without Rust&rsquo;s complexity) makes it a stronger choice than C++ for some financial applications.</li>
+</ul>
+<h4 id="web-api-services">🔹 Web &amp; API Services<a class="headerlink" href="#web-api-services" title="Permanent link">#</a></h4>
+<ul>
+<li>Startups and large enterprises love Go for building REST/gRPC APIs quickly.</li>
+<li>Popular web frameworks (Gin, Echo, Fiber) make Go an efficient alternative to Python for backend services.</li>
+</ul>
+<h4 id="go-hall-of-fame-who-runs-on-go">🏆 Go Hall of Fame: Who Runs on Go<a class="headerlink" href="#go-hall-of-fame-who-runs-on-go" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Company</th>
+<th>What They&rsquo;re Building</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Google</strong></td>
+<td>Internal services, Kubernetes, gRPC</td>
+</tr>
+<tr>
+<td><strong>Uber</strong></td>
+<td>High-QPS microservices, geofencing</td>
+</tr>
+<tr>
+<td><strong>Netflix</strong></td>
+<td>Scalable APIs, data processing pipelines</td>
+</tr>
+<tr>
+<td><strong>Cloudflare</strong></td>
+<td>Distributed networking services, edge computing</td>
+</tr>
+<tr>
+<td><strong>Docker &amp; Kubernetes</strong></td>
+<td>The backbone of cloud-native infrastructure</td>
+</tr>
+<tr>
+<td><strong>Twitch</strong></td>
+<td>Chat systems, real-time features</td>
+</tr>
+<tr>
+<td><strong>Dropbox</strong></td>
+<td>File synchronization, backend services</td>
+</tr>
+<tr>
+<td><strong>PayPal</strong></td>
+<td>Payment processing systems</td>
+</tr>
+<tr>
+<td><strong>American Express</strong></td>
+<td>Financial transaction services</td>
+</tr>
+<tr>
+<td><strong>Monzo</strong></td>
+<td>Banking infrastructure</td>
+</tr>
+</tbody>
+</table>
+<p>Go is the default choice for companies that need scalable, high-throughput backend services with a focus on simplicity and rapid development.</p>
+<h3 id="rust-in-the-wild-the-performance-powerhouse">Rust in the Wild: The Performance Powerhouse<a class="headerlink" href="#rust-in-the-wild-the-performance-powerhouse" title="Permanent link">#</a></h3>
+<p>Rust started in systems programming, but it&rsquo;s rapidly expanding into high-performance backend services where Go&rsquo;s garbage collection or runtime overhead become bottlenecks.</p>
+<h4 id="cloud-infrastructure">🔹 Cloud &amp; Infrastructure<a class="headerlink" href="#cloud-infrastructure" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Cloudflare</strong> rewrote core DNS and proxy services in Rust for low-latency, high-performance networking.</li>
+<li><strong>AWS Firecracker</strong> (microVMs powering Lambda &amp; Fargate) is written in Rust for security and efficiency.</li>
+<li><strong>Fly.io</strong> uses Rust for high-performance cloud hosting infrastructure.</li>
+</ul>
+<h4 id="messaging-real-time-systems">🔹 Messaging &amp; Real-Time Systems<a class="headerlink" href="#messaging-real-time-systems" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Discord</strong> rewrote a key service from Go to Rust, eliminating garbage collection pauses and improving performance.</li>
+<li>Companies needing low-latency messaging (chat apps, real-time gaming) are increasingly turning to Rust.</li>
+</ul>
+<h4 id="finance-high-frequency-trading">🔹 Finance &amp; High-Frequency Trading<a class="headerlink" href="#finance-high-frequency-trading" title="Permanent link">#</a></h4>
+<ul>
+<li>Trading systems, risk analysis, and financial modeling favor Rust&rsquo;s predictable performance and safety guarantees.</li>
+<li>Unlike Go, Rust avoids unpredictable GC pauses, making it ideal for low-latency trading applications.</li>
+</ul>
+<h4 id="cryptography-blockchain">🔹 Cryptography &amp; Blockchain<a class="headerlink" href="#cryptography-blockchain" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Solana, Polkadot</strong>, and multiple blockchains are written in Rust for security and speed.</li>
+<li>Rust dominates in crypto protocols, secure enclaves, and cryptographic libraries.</li>
+</ul>
+<h4 id="gaming-embedded-systems">🔹 Gaming &amp; Embedded Systems<a class="headerlink" href="#gaming-embedded-systems" title="Permanent link">#</a></h4>
+<ul>
+<li>Game developers use Rust for backend servers, handling millions of concurrent players.</li>
+<li>The automotive and IoT industries are adopting Rust for real-time control systems.</li>
+</ul>
+<h4 id="rust-hall-of-fame-who-runs-on-rust">🏆 Rust Hall of Fame: Who Runs on Rust<a class="headerlink" href="#rust-hall-of-fame-who-runs-on-rust" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Company</th>
+<th>What They&rsquo;re Building</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AWS</strong></td>
+<td>Firecracker (MicroVMs for Lambda &amp; Fargate)</td>
+</tr>
+<tr>
+<td><strong>Cloudflare</strong></td>
+<td>Ultra-fast DNS &amp; proxy services, Wasm edge computing</td>
+</tr>
+<tr>
+<td><strong>Discord</strong></td>
+<td>Message processing (no GC pauses), real-time features</td>
+</tr>
+<tr>
+<td><strong>Solana &amp; Polkadot</strong></td>
+<td>High-performance blockchain networks</td>
+</tr>
+<tr>
+<td><strong>Microsoft</strong></td>
+<td>Systems programming, security-critical applications, parts of Windows</td>
+</tr>
+<tr>
+<td><strong>Meta</strong></td>
+<td>Source control (Sapling), programming languages (Hack)</td>
+</tr>
+<tr>
+<td><strong>Mozilla</strong></td>
+<td>Firefox browser components, Servo engine</td>
+</tr>
+<tr>
+<td><strong>Dropbox</strong></td>
+<td>Storage system components</td>
+</tr>
+<tr>
+<td><strong>1Password</strong></td>
+<td>Security-critical password management</td>
+</tr>
+<tr>
+<td><strong>Figma</strong></td>
+<td>Performance-critical parts of design tools</td>
+</tr>
+</tbody>
+</table>
+<p>Rust is displacing C++ in industries where low-latency, safety, and reliability matter most.</p>
+<h2 id="philosophical-differences">Philosophical Differences<a class="headerlink" href="#philosophical-differences" title="Permanent link">#</a></h2>
+<h3 id="rust-power-and-safety-at-any-cost">🚀 Rust: Power and Safety at Any Cost<a class="headerlink" href="#rust-power-and-safety-at-any-cost" title="Permanent link">#</a></h3>
+<p>Rust is a systems programming language that demands rigor. It was built for absolute control, to be the spiritual successor to C++ without the footguns. Rust&rsquo;s philosophy is:</p>
+<blockquote>
+<p>&ldquo;Give developers the power to write the fastest, safest code possible, even if it means making them work for it.&rdquo;</p>
+</blockquote>
+<p>That means:</p>
+<ul>
+<li>✅ <strong>Zero-cost abstractions</strong> – No hidden runtime costs. High-level code compiles down to blazing-fast machine instructions.</li>
+<li>✅ <strong>Memory safety without garbage collection</strong> – If your Rust code compiles, it won&rsquo;t have data races, buffer overflows, or use-after-frees.</li>
+<li>✅ <strong>Fearless concurrency</strong> – The borrow checker forces safe parallelism at compile time.</li>
+<li>✅ <strong>Reliability at scale</strong> – Rust&rsquo;s strict compiler prevents entire categories of runtime bugs that plague other languages.</li>
+</ul>
+<p>Rust trusts the developer, but only after the compiler has wrung every mistake out of their code. It forces good habits. You don&rsquo;t get to &ldquo;just ship it and hope for the best.&rdquo; You earn correctness before runtime even begins.</p>
+<p>For many engineers, this discipline is freedom—once it compiles, you know it works.</p>
+<p>But for others, Rust&rsquo;s philosophy feels oppressive.</p>
+<h3 id="go-simplicity-speed-and-getting-things-done">🛠️ Go: Simplicity, Speed, and Getting Things Done<a class="headerlink" href="#go-simplicity-speed-and-getting-things-done" title="Permanent link">#</a></h3>
+<p>Go is unapologetically simple. It was built by Google to make backend engineering fast and boring. Go&rsquo;s philosophy is:</p>
+<blockquote>
+<p>&ldquo;Make it easy to write code that is good enough and maintainable by teams.&rdquo;</p>
+</blockquote>
+<p>That means:</p>
+<ul>
+<li>✅ <strong>Minimalist language design</strong> – Few features. No unnecessary complexity. Code is readable and uniform across teams.</li>
+<li>✅ <strong>Garbage collection</strong> – Developers focus on business logic, not memory management.</li>
+<li>✅ <strong>Built-in concurrency</strong> – Goroutines make parallel programming dead simple.</li>
+<li>✅ <strong>Fast compilation, fast deployment</strong> – Go gets out of the way, so developers ship features quickly.</li>
+</ul>
+<p>Go embraces pragmatism over perfection. It doesn&rsquo;t care about squeezing out every last drop of performance. It cares about developer speed, team scalability, and making sure software stays maintainable over years.</p>
+<p>For some engineers, this simplicity is a superpower—they can iterate, build, and deploy faster than in almost any other compiled language.</p>
+<p>But for others, Go&rsquo;s philosophy feels limiting—like it&rsquo;s holding them back from full control over their machine.</p>
+<h3 id="rust-vs-go-the-battle-of-philosophy">Rust vs. Go: The Battle of Philosophy<a class="headerlink" href="#rust-vs-go-the-battle-of-philosophy" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Principle</th>
+<th>Rust ⚡ (Power &amp; Safety)</th>
+<th>Go 🚀 (Simplicity &amp; Speed)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Memory Management</td>
+<td>No garbage collector. Ownership model ensures safety.</td>
+<td>Garbage-collected. Memory management is automatic.</td>
+</tr>
+<tr>
+<td>Concurrency Model</td>
+<td>Manual but enforced at compile time. Fearless concurrency.</td>
+<td>Goroutines + channels. Effortless parallelism.</td>
+</tr>
+<tr>
+<td>Error Handling</td>
+<td>Result types (Result<T, E>) force explicit handling.</td>
+<td>Error values (if err != nil)—simple but easy to ignore.</td>
+</tr>
+<tr>
+<td>Compile-Time Guarantees</td>
+<td>Compiler enforces strict correctness.</td>
+<td>Minimal safety checks—runtime failures can happen.</td>
+</tr>
+<tr>
+<td>Performance Focus</td>
+<td>No runtime costs. Optimized for maximum speed.</td>
+<td>Runtime optimizations trade off speed for developer ease.</td>
+</tr>
+<tr>
+<td>Learning Curve</td>
+<td>Steep. Borrow checker, lifetimes, and ownership take time to master.</td>
+<td>Shallow. Simple syntax, minimal concepts, easy onboarding.</td>
+</tr>
+<tr>
+<td>Philosophy</td>
+<td>&ldquo;Correctness above all.&rdquo; You pay upfront, but your code is rock solid.</td>
+<td>&ldquo;Good enough, shipped fast.&rdquo; Code is easy to write, run, and maintain.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-developers-choose-one-over-the-other">🔍 Why Developers Choose One Over the Other<a class="headerlink" href="#why-developers-choose-one-over-the-other" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Rust</strong> is for developers who want maximum control, safety, and performance, even if it means a steep learning curve.</li>
+<li><strong>Go</strong> is for developers who want to move fast, write simple code, and scale teams easily, even if it means sacrificing some low-level control.</li>
+</ul>
+<p>👉 Startups and cloud-native companies love Go because it lets them iterate quickly.<br />
+👉 Financial firms, blockchain developers, and performance-obsessed engineers prefer Rust because bugs and unpredictable GC pauses are unacceptable.</p>
+<p>Some teams use both:</p>
+<ul>
+<li><strong>Rust</strong> for the hardcore, latency-sensitive components.</li>
+<li><strong>Go</strong> for APIs, glue code, and infrastructure.</li>
+</ul>
+<p>Neither language is &ldquo;better&rdquo; universally. It&rsquo;s about which philosophy aligns with your needs.</p>
+<p>Go gets the job done.<br />
+Rust makes sure the job is done right.</p>
+<p>Which one fits you?</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 7, 2025</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/TFMV" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/TFMV" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.indexes", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
