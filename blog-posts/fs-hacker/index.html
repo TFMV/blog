@@ -805,28 +805,38 @@ objcopy<span class="w"> </span>--add-section<span class="w"> </span>.backdoor<sp
 <h2 id="the-filesystem-arms-race">The Filesystem Arms Race<a class="headerlink" href="#the-filesystem-arms-race" title="Permanent link">#</a></h2>
 <p>Ghost&rsquo;s success was a mix of precision, speed, and stealth. But defenders can turn the tables with the right tools.</p>
 <p>The battlefield is asymmetric:</p>
-<ul>
-<li>🔻 <strong>Attackers</strong>: Need only one weakness.</li>
-<li>
-<p>🔹 <strong>Defenders</strong>: Must cover everything.</p>
-</li>
-<li>
-<p>🔻 <strong>Attackers</strong>: Operate with surgical precision on a single target.</p>
-</li>
-<li>
-<p>🔹 <strong>Defenders</strong>: Must maintain vigilance across thousands of systems.</p>
-</li>
-<li>
-<p>🔻 <strong>Attackers</strong>: Choose when to strike.</p>
-</li>
-<li>
-<p>🔹 <strong>Defenders</strong>: Must be alert 24/7.</p>
-</li>
-<li>
-<p>🔻 <strong>Attackers</strong>: Can abandon failed attempts.</p>
-</li>
-<li>🔹 <strong>Defenders</strong>: Can never abandon their posts.</li>
-</ul>
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 8px; border: 1px solid #ddd;">Aspect</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Attackers</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Defenders</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Weakness</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Need only one weakness</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Must cover everything</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Precision</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Operate with surgical precision</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Must maintain vigilance across systems</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Timing</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Choose when to strike</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Must be alert 24/7</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Failure</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Can abandon failed attempts</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Can never abandon their posts</td>
+    </tr>
+  </tbody>
+</table>
+
 <p>But defenders have one critical advantage: scale.</p>
 <p>While Ghost manually traverses one system at a time, defenders can deploy Filewalker across an entire enterprise simultaneously.</p>
 <h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link">#</a></h3>
