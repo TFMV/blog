@@ -12,11 +12,13 @@
         <meta name="author" content="Thomas F McGeehan V">
       
       
-        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/billion/">
+        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/pygomo/">
       
       
-        <link rel="prev" href="../quiver/">
+        <link rel="prev" href="../..">
       
+      
+        <link rel="next" href="../time-machine/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -24,7 +26,7 @@
     
     
       
-        <title>Billion - Blog - Thomas F McGeehan V</title>
+        <title>Mojo is Fast - Blog - Thomas F McGeehan V</title>
       
     
     
@@ -69,11 +71,11 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Billion - Blog - Thomas F McGeehan V" >
+        <meta  property="og:title"  content="Mojo is Fast - Blog - Thomas F McGeehan V" >
       
         <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/billion.png" >
+        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/pygomo.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -81,15 +83,15 @@
       
         <meta  property="og:image:height"  content="630" >
       
-        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/billion/" >
+        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/pygomo/" >
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Billion - Blog - Thomas F McGeehan V" >
+        <meta  name="twitter:title"  content="Mojo is Fast - Blog - Thomas F McGeehan V" >
       
         <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/billion.png" >
+        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/pygomo.png" >
       
     
     
@@ -112,7 +114,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-billion-row-challenge" class="md-skip">
+        <a href="#mojo-is-fast-but-is-it-the-future-of-python-or-just-a-flicker-in-the-dark" class="md-skip">
           Skip to content
         </a>
       
@@ -146,7 +148,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Billion
+              Mojo is Fast
             
           </span>
         </div>
@@ -276,7 +278,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../pygomo/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
     
@@ -421,10 +423,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../pygomo/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -434,6 +445,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -575,19 +587,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../billion/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -597,7 +600,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -647,104 +649,79 @@
   
 
 
-<h1 id="the-billion-row-challenge">The Billion Row Challenge<a class="headerlink" href="#the-billion-row-challenge" title="Permanent link">#</a></h1>
-<h2 id="a-fun-exercise-in-speed">A Fun Exercise in Speed<a class="headerlink" href="#a-fun-exercise-in-speed" title="Permanent link">#</a></h2>
-<p>I came across the Billion Row Challenge the other day. Sounded fun. Take a massive dataset, process it as fast as possible, and see how well you can optimize your approach. Right up my alley.</p>
-<p>The challenge itself is simple:</p>
-<p>You get a file full of billions of weather station measurements, formatted as <code>station_name;temperature_value</code>.</p>
-<p>The goal? Compute the min, mean, and max temperature for each station as fast as possible.</p>
-<p>Seems straightforward, right? It never is.</p>
-<h2 id="the-first-attempt-the-just-get-it-working-version">The First Attempt: The &ldquo;Just Get It Working&rdquo; Version<a class="headerlink" href="#the-first-attempt-the-just-get-it-working-version" title="Permanent link">#</a></h2>
-<p>The naive approach is always the same:</p>
-<ol>
-<li>Read the file line by line.</li>
-<li>Split each line at the semicolon.</li>
-<li>Parse the temperature.</li>
-<li>Store the results in a map.</li>
-<li>Print out the min, mean, and max for each station.</li>
-</ol>
-<p>I wrote a basic Go program to do exactly that. It worked. It also took forever.</p>
-<p>Reading a massive text file line by line? Slow. Parsing strings with <code>strings.Split</code>? Slow. Allocating memory every time a new station appears? Very slow.</p>
-<p>Clearly, I needed something better.</p>
-<h2 id="v1-first-round-of-optimizations">V1: First Round of Optimizations<a class="headerlink" href="#v1-first-round-of-optimizations" title="Permanent link">#</a></h2>
-<p>At this point, I knew I had to rethink the whole approach. Here&rsquo;s what I ended up doing:</p>
-<h3 id="1-memory-mapping-the-file">1. Memory Mapping the File<a class="headerlink" href="#1-memory-mapping-the-file" title="Permanent link">#</a></h3>
-<p>Instead of reading line by line, I used mmap (memory-mapped files) to treat the file as if it were already loaded in memory. This avoids expensive system calls and allows for ultra-fast access to data.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">reader</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">mmap</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
+<h1 id="mojo-is-fast-but-is-it-the-future-of-python-or-just-a-flicker-in-the-dark">Mojo is Fast. But is it the Future of Python or Just a Flicker in the Dark?<a class="headerlink" href="#mojo-is-fast-but-is-it-the-future-of-python-or-just-a-flicker-in-the-dark" title="Permanent link">#</a></h1>
+<h2 id="benchmarking-python-go-and-mojo">Benchmarking Python, Go and Mojo<a class="headerlink" href="#benchmarking-python-go-and-mojo" title="Permanent link">#</a></h2>
+<p>I couldn’t sleep again last night.</p>
+<p>When that happens, I don’t lie awake waiting for rest to find me. I code.</p>
+<p>There’s something about the dead hours, when the world is quiet and thoughts are sharper, like steel on a whetstone. And last night, one thought wouldn’t let go.</p>
+<p>How fast is Mojo, really?</p>
+<p>I’ve seen the hype and bold claims. Python, but fast. Python, unchained. But I don’t care about marketing. Show me the numbers. So I did what I always do when a language promises speed.</p>
+<p>I put it to the test.</p>
+<p>A benchmark. Nothing fancy, just the N-body simulation, a brutal, CPU-bound physics problem that chews through floating-point math. Three implementations. Python. Go. Mojo. Side by side. No tricks. No magic. Just raw computation.</p>
+<p>I chose the N-body simulation for this benchmark because neither I nor ChatGPT know Mojo. But Modular does. Their repo includes a few examples, and N-body happens to be one of them.</p>
+<p>If you’d rather dive straight into the code and charts than wade through my words, I get it. The numbers speak for themselves.</p>
+<p>Here’s the <a href="https://github.com/TFMV/PyGoMo">repo</a>.</p>
+<h2 id="bench">Bench<a class="headerlink" href="#bench" title="Permanent link">#</a></h2>
+<p>As is my way, I over-engineered the hell out of the thing.</p>
+<p>First, there’s the bash script. Of course, it uses strict mode with set -euo pipefail, because heaven forbid a silent failure ruin my one-time run. It also features pushd and popd, because clearly, directory changes needed call and response.</p>
+<p>Mind you, this script was meant to be run exactly once. But if I’m going to automate something, I’m going to automate it right, even if it never sees the light of day again.</p>
+<p>Then you have the Python benchmark script, which the Bash script calls.</p>
+<p>Now, you might think this script would be simple. A quick loop, a couple of function calls, maybe a print statement or two. But no. This thing imports Pandas and Matplotlib, as if I were writing a full-blown data analysis pipeline instead of timing how fast my CPU can do math.</p>
+<p>Look, if I’m benchmarking something, I want charts. I want CSV exports. I want a performance autopsy, even if all I really need is a stopwatch and a for loop.</p>
+<p>I won’t bore you with the details of the individual Python, Go, and Mojo implementations, but suffice it to say, I tried my best.</p>
+<p>The numbers had the answers.</p>
+<h2 id="reckoning">Reckoning<a class="headerlink" href="#reckoning" title="Permanent link">#</a></h2>
+<p>The benchmarks were set. The scripts were ready. The only thing left to do was press run and see who survived.</p>
+<p>Then, the terminal came alive:</p>
+<div class="highlight"><pre><span></span><code>☁<span class="w">  </span>PyGoMo<span class="w"> </span><span class="o">[</span>feature/PyGoMo<span class="o">]</span><span class="w"> </span>⚡<span class="w">  </span>./run_benchmarks.sh
+Checking<span class="w"> </span>Python<span class="w"> </span>dependencies...
+Using<span class="w"> </span>requirements.txt<span class="w"> </span>from<span class="w"> </span>python<span class="w"> </span>directory
+Building<span class="w"> </span>Go<span class="w"> </span>implementation...
+Checking<span class="w"> </span><span class="k">for</span><span class="w"> </span>Magic<span class="w"> </span><span class="nb">command</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>Mojo...
+Magic<span class="w"> </span><span class="nb">command</span><span class="w"> </span>found,<span class="w"> </span>Mojo<span class="w"> </span>benchmarks<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>included.
+Mojo<span class="w"> </span>implementation<span class="w"> </span>found<span class="w"> </span>at<span class="w"> </span>mojo/nbody/nbody.mojo
+
+Running<span class="w"> </span>benchmarks...
 </code></pre></div>
-<p>This alone gave a huge speed boost.</p>
-<h3 id="2-parallel-processing">2. Parallel Processing<a class="headerlink" href="#2-parallel-processing" title="Permanent link">#</a></h3>
-<p>Go has goroutines. I planned to use them.</p>
-<ul>
-<li>Split the file into chunks.</li>
-<li>Process each chunk in a separate worker.</li>
-<li>Aggregate the results at the end.</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="nx">numCPU</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">NumCPU</span><span class="p">()</span>
-<span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="p">&lt;</span><span class="w"> </span><span class="nx">numCPU</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">workerWg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="w">    </span><span class="k">go</span><span class="w"> </span><span class="nx">Worker</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">jobs</span><span class="p">,</span><span class="w"> </span><span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">workerWg</span><span class="p">)</span>
-<span class="p">}</span>
+<p>No turning back now.</p>
+<p>Would Python limp across the finish line? Would Go hold steady? Would Mojo finally live up to its promises? Does my cat love me?</p>
+<p>Then I waited.</p>
+<p>Because the Python benchmark runs first.</p>
+<div class="highlight"><pre><span></span><code>Running<span class="w"> </span>Python<span class="w"> </span>benchmark<span class="w"> </span>with<span class="w"> </span><span class="m">100</span><span class="w"> </span>bodies...
+<span class="w">  </span>Run<span class="w"> </span><span class="m">1</span>/3:<span class="w"> </span><span class="m">2</span>.0672<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">2</span>/3:<span class="w"> </span><span class="m">2</span>.0964<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">3</span>/3:<span class="w"> </span><span class="m">2</span>.0296<span class="w"> </span>seconds
+Python<span class="w"> </span>average<span class="w"> </span>execution<span class="w"> </span>time:<span class="w"> </span><span class="m">2</span>.0644<span class="w"> </span>seconds
+
+Running<span class="w"> </span>Python<span class="w"> </span>benchmark<span class="w"> </span>with<span class="w"> </span><span class="m">500</span><span class="w"> </span>bodies...
+<span class="w">  </span>Run<span class="w"> </span><span class="m">1</span>/3:<span class="w"> </span><span class="m">53</span>.1252<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">2</span>/3:<span class="w"> </span><span class="m">52</span>.9157<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">3</span>/3:<span class="w"> </span><span class="m">52</span>.9705<span class="w"> </span>seconds
+Python<span class="w"> </span>average<span class="w"> </span>execution<span class="w"> </span>time:<span class="w"> </span><span class="m">53</span>.0038<span class="w"> </span>seconds
+
+Running<span class="w"> </span>Python<span class="w"> </span>benchmark<span class="w"> </span>with<span class="w"> </span><span class="m">1000</span><span class="w"> </span>bodies...
+<span class="w">  </span>Run<span class="w"> </span><span class="m">1</span>/3:<span class="w"> </span><span class="m">212</span>.8036<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">2</span>/3:<span class="w"> </span><span class="m">215</span>.9167<span class="w"> </span>seconds
+<span class="w">  </span>Run<span class="w"> </span><span class="m">3</span>/3:<span class="w"> </span><span class="m">215</span>.4882<span class="w"> </span>seconds
+Python<span class="w"> </span>average<span class="w"> </span>execution<span class="w"> </span>time:<span class="w"> </span><span class="m">214</span>.7362<span class="w"> </span>seconds
+
+Running<span class="w"> </span>Python<span class="w"> </span>benchmark<span class="w"> </span>with<span class="w"> </span><span class="m">2000</span><span class="w"> </span>bodies...
 </code></pre></div>
-<p>Each worker handled a chunk of data and sent its results back through a channel. This meant I could fully utilize my CPU cores instead of waiting around for I/O.</p>
-<h3 id="3-custom-hash-table-for-fast-lookups">3. Custom Hash Table for Fast Lookups<a class="headerlink" href="#3-custom-hash-table-for-fast-lookups" title="Permanent link">#</a></h3>
-<p>Instead of using Go&rsquo;s built-in <code>map[string]Stats</code>, I wrote a custom hash table using open addressing with linear probing. This reduced memory overhead and improved lookup speed when updating station statistics.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">capacity</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">nextPowerOfTwo</span><span class="p">(</span><span class="nx">expectedStations</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">keys</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="nx">StationStats</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">occupied</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-</code></pre></div>
-<p>Every lookup or insert happened in constant time.</p>
-<h3 id="4-zero-allocation-string-parsing">4. Zero-Allocation String Parsing<a class="headerlink" href="#4-zero-allocation-string-parsing" title="Permanent link">#</a></h3>
-<p>Go&rsquo;s default string parsing methods allocate memory like there&rsquo;s no tomorrow. Instead of using <code>strings.Split</code>, I manually found the separator and used unsafe string conversions to avoid unnecessary allocations.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sepIdx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bytes</span><span class="p">.</span><span class="nx">IndexByte</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;;&#39;</span><span class="p">)</span>
-<span class="nx">station</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">UnsafeString</span><span class="p">(</span><span class="nx">line</span><span class="p">[:</span><span class="nx">sepIdx</span><span class="p">])</span>
-<span class="nx">measurement</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ParseFloat</span><span class="p">(</span><span class="nx">line</span><span class="p">[</span><span class="nx">sepIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-</code></pre></div>
-<p>No extra allocations. No garbage collection overhead.</p>
-<h2 id="v1-results-getting-closer">V1 Results: Getting Closer<a class="headerlink" href="#v1-results-getting-closer" title="Permanent link">#</a></h2>
-<p>After these optimizations, I got the processing time down to about 14.79 seconds for a billion rows. Not bad, but I knew we could do better.</p>
-<h2 id="v2-breaking-the-speed-barrier">V2: Breaking the Speed Barrier<a class="headerlink" href="#v2-breaking-the-speed-barrier" title="Permanent link">#</a></h2>
-<p>The journey to sub-4-second processing required even more aggressive optimizations:</p>
-<h3 id="1-integer-based-temperature-storage">1. Integer-Based Temperature Storage<a class="headerlink" href="#1-integer-based-temperature-storage" title="Permanent link">#</a></h3>
-<p>Instead of using floats, we store temperatures as int16 with an implied decimal point. This not only saves memory but also makes calculations much faster.</p>
-<h3 id="2-fixed-size-buffers">2. Fixed-Size Buffers<a class="headerlink" href="#2-fixed-size-buffers" title="Permanent link">#</a></h3>
-<p>We pre-allocate fixed-size buffers for station names, eliminating dynamic allocations during processing:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">stationName</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">hashVal</span><span class="w"> </span><span class="kt">uint32</span>
-<span class="w">    </span><span class="nx">byteLen</span><span class="w"> </span><span class="kt">int</span>
-<span class="w">    </span><span class="nx">name</span><span class="w">    </span><span class="p">[</span><span class="nx">MaxLineLength</span><span class="p">]</span><span class="kt">byte</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="3-larger-batch-sizes">3. Larger Batch Sizes<a class="headerlink" href="#3-larger-batch-sizes" title="Permanent link">#</a></h3>
-<p>We increased the batch size to 256MB, which significantly improved I/O throughput:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">BatchSizeBytes</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">256</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="c1">// 256 MB</span>
-</code></pre></div>
-<h3 id="4-branchless-temperature-parsing">4. Branchless Temperature Parsing<a class="headerlink" href="#4-branchless-temperature-parsing" title="Permanent link">#</a></h3>
-<p>We rewrote the temperature parsing to be as branchless as possible, making it more CPU-cache friendly.</p>
-<h3 id="5-lock-free-processing">5. Lock-Free Processing<a class="headerlink" href="#5-lock-free-processing" title="Permanent link">#</a></h3>
-<p>By carefully designing our data structures, we eliminated the need for locks in our parallel processing pipeline.</p>
-<h2 id="the-final-results-breaking-records">The Final Results: Breaking Records<a class="headerlink" href="#the-final-results-breaking-records" title="Permanent link">#</a></h2>
-<p>The V2 implementation achieved something remarkable:</p>
-<div class="highlight"><pre><span></span><code><span class="o">===</span><span class="w"> </span>Benchmark<span class="w"> </span><span class="nv">Summary</span><span class="w"> </span><span class="o">===</span>
-Total<span class="w"> </span>Processing<span class="w"> </span>Time:<span class="w"> </span><span class="m">3</span>.35<span class="w"> </span>seconds
-Throughput:<span class="w"> </span><span class="m">298</span>.16<span class="w"> </span>million<span class="w"> </span>rows/second
-Memory<span class="w"> </span>Used:<span class="w"> </span><span class="m">516</span>.91<span class="w"> </span>MB
-Number<span class="w"> </span>of<span class="w"> </span>CPUs:<span class="w"> </span><span class="m">10</span>
-Batch<span class="w"> </span>Size:<span class="w"> </span><span class="m">256</span><span class="w"> </span><span class="nv">MB</span>
-<span class="o">=====================</span>
-</code></pre></div>
-<p><strong>3.35 seconds for a billion rows.</strong> That&rsquo;s a 77% improvement over V1!</p>
-<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">#</a></h2>
-<ol>
-<li><strong>Memory efficiency is king.</strong> Fixed-size buffers and integer math made a huge difference.</li>
-<li><strong>Batch size matters.</strong> Larger batches meant better I/O throughput.</li>
-<li><strong>Avoid branches.</strong> CPU branch prediction is expensive; eliminate branches where possible.</li>
-<li><strong>Know your hardware.</strong> Understanding CPU cache lines and memory alignment paid off.</li>
-<li><strong>Sometimes unsafe is necessary.</strong> Strategic use of unsafe operations can yield significant performance gains.</li>
-<li><strong>Measure, don&rsquo;t guess.</strong> Every optimization was validated with benchmarks.</li>
-</ol>
-<p>The journey from 14.79 seconds to 3.35 seconds shows that there&rsquo;s always room for optimization when you&rsquo;re willing to dig deep enough into the problem. It&rsquo;s not just about writing faster code—it&rsquo;s about understanding the entire stack, from the hardware up.</p>
+<p>Why 2000 bodies? I don’t know. But I needed another Red Bull anyway.</p>
+<p>When I came back, Python was still running. And by “running,” I mean deep in existential crisis, questioning the meaning of loops.</p>
+<p>So I did the only reasonable thing: I rewrote the Python implementation from scratch. And because I wasn’t in the mood to wait another 15 minutes, I made it self-aware.</p>
+<p>Now, it decides at runtime whether to use plain NumPy or Numba JIT acceleration.<br />
+Because why not let Python choose how much pain it wants to endure?</p>
+<p>I had time to reflect while Python ran. And by reflect, I mean question my life choices. It was around 4AM by this time.</p>
+<p><img alt="Benchmark Results" src="../../art/benchmark_comparison.png" /></p>
+<p>Mojo was fast. Impressively fast. But was it shocking? Not really.</p>
+<p>Did it change my life? No.<br />
+Did it make me question everything I knew about Python? Not particularly.<br />
+Does my cat love me? Unclear.</p>
+<p>Mojo is really fast. But until it has Python’s libraries, that speed is waiting for something to do.</p>
+<blockquote>
+<p>Fast code is nice. Actually being able to use it is better.</p>
+</blockquote>
 
 
 
@@ -765,7 +742,7 @@ Batch<span class="w"> </span>Size:<span class="w"> </span><span class="m">256</s
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 2, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 7, 2025</span>
   </span>
 
     
