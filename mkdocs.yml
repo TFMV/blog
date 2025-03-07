@@ -32,11 +32,16 @@ theme:
 nav:
   - Home: index.md
   - Blog:
+      - Arrow Ecosystem: blog-posts/arrow-ecosystem.md
       - Arrow Flight: blog-posts/flight.md
-      - Go and Arrow: blog-posts/go-arrow.md
-      - The Unilateral Bond: blog-posts/unilateral-bond.md
-      - Quiver: blog-posts/quiver.md
       - Billion: blog-posts/billion.md
+      - Go and Arrow: blog-posts/go-arrow.md
+      - Living Databases: blog-posts/time-machine.md
+      - Mojo is Fast: blog-posts/pygomo.md
+      - Quiver: blog-posts/quiver.md
+      - Rust vs Go: blog-posts/rust-vs-go.md
+      - The Unilateral Bond: blog-posts/unilateral-bond.md
+      - Walking the Filesystem like a Hacker: blog-posts/fs-hacker.md
 
 plugins:
   - search

@@ -14,9 +14,9 @@ And sometimes, I just write poetry.
 
 ## 📌 Latest Posts  
 
-### [Arrow Flight](blog-posts/flight.md)
+### [Living Databases](blog-posts/time-machine.md)
 
-How Apache Arrow Flight revolutionizes high-speed data exchange and what it means for modern data pipelines.
+The most powerful database feature isn’t speed or scale; it’s the ability to revise history.
 
 ---
 
