@@ -1,435 +1,433 @@
-# Quiver
-
-A local-first vector database combining structured queries with high-speed similarity search—without the complexity of distributed systems.
-
-## The Vector Search Problem
-
-Picture this: You've built an amazing AI application that needs vector search. The usual choices? Heavyweight vector databases that demand a fleet of machines—or barebones libraries that can't handle metadata, filtering, or hybrid queries.
-
-Why is there no SQLite for vector search?
-Something lightweight. Something fast. Something that just works.
-
-Every day, developers face this challenge:
-
-- Heavyweight databases designed for clusters you don't need
-- Basic libraries that can't handle structured data alongside vectors
-- The choice between power and simplicity
-- Infrastructure complexity that gets in the way of building
-
-## Quiver: Vector Search Meets Simplicity
-
-Quiver is what happens when vector search meets simplicity:
-
-- Blazing-fast HNSW for high-performance similarity search
-- DuckDB-style local-first indexing—fast hybrid search without clusters
-- SQL-like filtering alongside vector search
-- Low overhead—runs on your laptop, embedded in applications, or on-prem
-
-```bash
-# Get started in two commands
-go get github.com/TFMV/quiver
-quiver serve
-```
-
-## Why Quiver? The Speed You Need, The Simplicity You Want
-
-### 🚀 Lightning-Fast Local Search
-
-Quiver's HNSW implementation isn't just fast—it's optimized for single-node performance:
-
-```go
-// Find similar vectors in microseconds, right on your machine
-results, err := index.Search(queryVector, 10)
-```
-
-### 🎯 Hybrid Search That Just Works
-
-Combine vector similarity with structured filters, all processed locally:
-
-```go
-// Find similar science articles from last week
-results, err := index.SearchWithFilter(
-    queryVector,
-    10,
-    "category = 'science' AND date > '2024-03-10'"
-)
-```
-
-### 📦 Smart Local Processing
-
-Optimized for your machine's resources:
-
-- Efficient memory management
-- Local metadata caching
-- Background processing that respects your CPU
-
-### 🏹 Local Batch Processing with Arrow
-
-Native support for Apache Arrow means efficient local data handling:
-
-```go
-// Batch process vectors locally with Arrow
-err := index.AppendFromArrow(record)
-```
-
-## Show Me The Numbers
-
-How fast is Quiver?
-
-- 28,800 vector searches per second
-- Hybrid search in <0.5ms
-- Batch processing at 10M+ vectors/sec
-
-Here are our benchmarks running on a standard 8-core laptop with 1M 128-dimensional vectors:
-
-| Operation     | Throughput    | Latency | Memory/Op | Allocs/Op |
-| ------------- | ------------- | ------- | --------- | --------- |
-| Search        | 28.8K ops/sec | 41µs    | 1.5 KB    | 18        |
-| Hybrid Search | 2.5K ops/sec  | 432µs   | 7.5 KB    | 278       |
-| Add           | 5.5K ops/sec  | 3.2ms   | 1.4 KB    | 21        |
-| Add Parallel  | 4.5K ops/sec  | 5.3ms   | 1.3 KB    | 20        |
-| Arrow Append* | 100 ops/sec   | 2.7s    | 2.3 MB    | 32,332    |
-
-### Batch Ingestion That Scales Without Clusters
-
-- Append 100,000 vectors per operation with Arrow
-- Optimized for local-first AI workloads, no distributed infrastructure required
-- High throughput: 10M+ records/sec for structured metadata + vectors
-
-What these numbers mean in practice:
-
-- **Fast local queries**: 41µs latency on a single machine
-- **Efficient memory use**: Most operations need just 1.5KB of memory
-- **Smart resource use**: Parallel operations optimize your machine's capabilities
-- **Local batch processing**: Efficient data loading with Arrow
-
-## Where Quiver Shines
-
-### 📚 Semantic Document Search
-
-```go
-// Index a document with rich metadata
-err := index.Add(docID, embedding, map[string]interface{}{
-    "title": "Understanding Vector Search",
-    "author": "Jane Doe",
-    "tags": []string{"AI", "databases"},
-    "readingTime": 5
-})
-```
-
-### 🎯 Smart Recommendations
-
-```go
-// Find similar products within price range
-results, err := index.SearchWithFilter(
-    userPreferences,
-    5,
-    "price BETWEEN 10 AND 50"
-)
-```
-
-### 🖼️ Visual Search
-
-```go
-// Find similar images with specific attributes
-results, err := index.SearchWithFilter(
-    imageEmbedding,
-    10,
-    "resolution = 'HD' AND style = 'minimalist'"
-)
-```
-
-### 🤖 RAG Applications
-
-Perfect for Retrieval-Augmented Generation:
-
-```go
-// Find relevant context for LLM
-context, err := index.SearchWithFilter(
-    queryEmbedding,
-    3,
-    "confidence > 0.8"
-)
-```
-
-## Getting Started: Two-Minute Setup
-
-### 1. Installation
-
-```bash
-go get github.com/TFMV/quiver
-```
-
-### 2. Initialize Your Index
-
-```go
-index, err := quiver.New(quiver.Config{
-    Dimension: 128,
-    StoragePath: "vectors.db",
-    MaxElements: 100000,
-})
-```
-
-### 3. Start Searching
-
-```go
-// Add vectors with metadata
-err = index.Add(1, vectorData, map[string]interface{}{
-    "category": "science",
-    "author": "Jane Doe",
-})
-
-// Search with type safety
-results, err := index.Search(queryVector, 10)
-```
-
-## REST API: Language-Agnostic Integration
-
-No Go? No problem. Quiver speaks HTTP:
-
-```bash
-curl -X POST http://localhost:8080/search/hybrid \
-  -H "Content-Type: application/json" \
-  -d '{
-    "vector": [0.1, 0.2, ...],
-    "k": 5,
-    "filter": "category = 'science'"
-  }'
-```
-
-## Why Choose Quiver?
-
-🚀 **Zero setup**—install & search in minutes
-⚡ **Blazing-fast**—sub-millisecond queries, even on a laptop
-🛠️ **Developer-friendly**—Go SDK & REST API
-💡 **No cloud lock-in**—runs anywhere, no clusters required
-
-## What's Next?
-
-Your AI. Your Data. Your Machine.
-
-Fast, flexible vector search—no clusters, no overhead.
-Whether you're running on a laptop, embedding in an app, or scaling in production, Quiver gives you vector search that just works.
-
-Ready to simplify vector search? [Check out Quiver on GitHub](https://github.com/TFMV/quiver).
+# Building a Hybrid Vector Search Database with Arrow and DuckDB
 
 ---
 
-## What's Under the Hood?
+## How we combined HNSW for fast vector search with SQL-based metadata filtering for a next-gen AI database
 
-Under the hood, Quiver combines HNSW-powered search with DuckDB-backed structured queries, wrapped in a production-ready Go API server and CLI. Here's how it all works together:
+Vector databases are no longer optional. As embeddings-based applications explode across industries, developers need speed, flexibility, and efficiency when storing, searching, and retrieving high-dimensional vectors. But here's the problem:
 
-### Production-Ready API Server
+Most vector databases force you to choose between raw performance and SQL-powered filtering.
 
-Built with [Fiber](https://gofiber.io/)—the Express-inspired, lightning-fast web framework for Go. Quiver's API server delivers production-grade performance and reliability out of the box.
+That's why we built Quiver — a Go-powered, hybrid vector database that delivers the best of both worlds:
 
-#### 🛡️ Battle-Tested Reliability
+- ✅ HNSW for fast, high-recall vector search
+- ✅ DuckDB for structured metadata filtering
+- ✅ Apache Arrow for efficient, zero-copy data movement
 
-- Graceful shutdown with connection draining
-- Custom error handling with structured responses
-- Middleware-driven architecture for extensibility
-- Automatic panic recovery via Fiber middleware
+With Quiver, you can run complex queries that mix vector similarity with structured constraints — without killing performance.
 
-#### ⚡ Performance Optimized
+This article isn't just a high-level introduction. We're diving deep into the internals — how I integrated Apache Arrow, optimized DuckDB for metadata management, and built a high-speed HNSW index — to create a vector search engine that doesn't compromise.
 
-- Response compression via Fiber's compress middleware
-- Configurable idle, read, and write timeouts
-- Zero-allocation routing with Fiber's radix tree
-- Automatic response pooling
+Let's get into it.
 
-#### 🔍 Observability Built-in
+## Vector Databases Have a Problem
 
-- Structured logging with Uber's Zap logger
-- Built-in Fiber monitoring middleware
-- Kubernetes-ready health probes
-- Detailed request tracing
+Vector databases are critical infrastructure for AI applications — powering everything from semantic search and recommendation systems to image similarity and anomaly detection. But despite their importance, most solutions come with serious trade-offs.
 
-#### 🎯 Developer Experience
+### Where Existing Vector Databases Fall Short
 
-- Express-style middleware chain
-- Type-safe request handling
-- Content negotiation out of the box
-- Flexible configuration
+- 🔥 **Performance vs. Flexibility Trade-offs** → Most vector databases are built for either fast similarity search or rich metadata filtering — not both. If you want speed, you lose SQL-style filtering. If you want SQL filtering, you lose performance.
+- 🔥 **Heavy Resource Consumption** → Many solutions demand huge memory and CPU overhead to maintain vector indices, making them expensive at scale.
+- 🔥 **Operational Complexity** → Most vector databases require careful tuning, background maintenance processes, and periodic reindexing to stay performant.
+- 🔥 **Integration Challenges** → Existing solutions often sit outside an organization's primary data stack, requiring custom pipelines and workarounds to sync with relational databases and analytical engines.
 
-```go
-// Production middleware stack
-app := fiber.New(fiber.Config{
-    IdleTimeout:  10 * time.Second,
-    ReadTimeout:  10 * time.Second,
-    WriteTimeout: 10 * time.Second,
-})
+### How Existing Solutions Approach the Problem
 
-// Middleware chain
-app.Use(recover.New())     // Auto-recover from panics
-app.Use(compress.New())    // Gzip compression
-app.Use(monitor.New())     // Performance metrics
-app.Use(customLogger(log)) // Structured logging
+Current vector search solutions take different approaches, each with trade-offs:
 
-// Type-safe error handling
-func customErrorHandler(log *zap.Logger) fiber.ErrorHandler {
-    return func(c *fiber.Ctx, err error) error {
-        code := fiber.StatusInternalServerError
-        if e, ok := err.(*fiber.Error); ok {
-            code = e.Code
-        }
-        log.Error("Request failed", 
-            zap.String("path", c.Path()),
-            zap.Int("status", code),
-            zap.Error(err),
-        )
-        return c.Status(code).JSON(fiber.Map{
-            "error": true,
-            "message": err.Error(),
-        })
-    }
-}
-```
+- **Weaviate** → Uses HNSW for vector search with a GraphQL-based query engine. Weaviate allows metadata filtering but stores metadata in RocksDB, which comes with additional operational overhead.
+- **Pinecone** → A managed service optimized for fast retrieval, but you lose control over the underlying infrastructure and can't easily run it locally.
+- **FAISS** → A highly optimized C++ library for pure vector search — but lacks a built-in metadata store, requiring developers to pair it with an external database.
+- **pgvector** → Brings vector search inside PostgreSQL, enabling SQL-based filtering, but scales poorly on large datasets due to PostgreSQL's row-based storage.
 
-### CLI
+## Why We Built Quiver
 
-Built with [Cobra](https://github.com/spf13/cobra) and [Viper](https://github.com/spf13/viper), Quiver's CLI provides a robust, production-grade command interface with features you'd expect from enterprise tools.
+We wanted a vector database that didn't force these trade-offs — one that keeps up with the best ANN search engines while supporting rich, efficient metadata filtering.
 
-#### 🎮 Command Structure
+- ✅ HNSW for high-speed vector search
+- ✅ DuckDB for SQL-powered metadata filtering
+- ✅ Apache Arrow for zero-copy, high-performance data movement
 
-```bash
-quiver
-├── serve     # Start the Quiver server
-├── status    # Check server health
-├── backup    # Backup index and metadata
-└── restore   # Restore from backup
-```
+Quiver avoids the overhead of external databases, scales efficiently, and fits seamlessly into modern AI and analytics stacks. Let's break down how it works.
 
-#### ⚙️ Flexible Configuration
+## Under the Hood
 
-- YAML configuration with sensible defaults
-- Environment variable support (`QUIVER_*`)
-- Command-line flag overrides
-- Automatic config discovery
+Quiver is built on three key components, each designed to maximize speed, flexibility, and efficiency:
 
-```yaml
-# config.yaml
-server:
-  port: 8080
-index:
-  dimension: 128
-  storage_path: "quiver.db"
-  max_elements: 100000
-  hnsw_m: 32
-  ef_construction: 200
-  ef_search: 200
-```
+1️⃣ **Vector Index** → An HNSW (Hierarchical Navigable Small World) graph for fast approximate nearest neighbor (ANN) search.
+2️⃣ **Metadata Store** → A DuckDB-backed SQL engine for structured metadata filtering.
+3️⃣ **Arrow Appender** → A zero-copy data pipeline powered by Apache Arrow, keeping everything memory-efficient and fast.
 
-#### 🛡️ Production Features
+These pieces work together to eliminate the trade-offs most vector databases force you to make — allowing queries that combine vector similarity with structured constraints without wrecking performance.
 
-- Graceful shutdown handling
-- Structured logging with Zap
-- Health check commands
-- Backup and restore capabilities
+### Blazing-Fast Search: The Vector Index
 
-```go
-// Production-grade server lifecycle
-ctx, stop := signal.NotifyContext(context.Background(), 
-    os.Interrupt, syscall.SIGTERM)
-defer stop()
+At the core of Quiver's vector search engine is HNSW (Hierarchical Navigable Small World) — a graph-based ANN algorithm built for speed and scalability.
 
-go func() {
-    <-ctx.Done()
-    logger.Info("Shutdown signal received")
-    if err := server.Shutdown(context.Background()); err != nil {
-        logger.Error("Server shutdown error", zap.Error(err))
-    }
-}()
-```
+HNSW is what makes Quiver's search both fast and accurate, offering logarithmic search complexity while keeping recall high. It works by constructing a multi-layered graph where similar vectors cluster together, drastically reducing the number of comparisons needed for a query.
 
-#### 🔧 Smart Defaults
+Our Go-based implementation of HNSW is optimized for:
 
-- Automatic index configuration
-- Environment-aware settings
-- Intelligent error handling
-- Clear, actionable error messages
-
-Whether you're running in development or production, the CLI provides a consistent, reliable interface for managing your Quiver instance.
-
-### Core Implementation
-
-At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.
-
-#### 🔍 Vector Search Engine
+- ✅ Memory efficiency → Minimizing index size without sacrificing recall.
+- ✅ High-speed inserts → Batch processing for fast vector ingestion.
+- ✅ Precision tuning → Fine-grained control over search parameters for balancing speed vs. accuracy.
 
 ```go
 type Index struct {
-    hnsw     *hnswgo.HnswIndex    // HNSW for vector search
-    metadata map[uint64]interface{} // Fast metadata access
-    db*sql.DB              // DuckDB for structured queries
-    cache    sync.Map             // High-performance metadata cache
+    config          Config
+    hnsw            *hnsw.Graph[uint64]
+    metadata        map[uint64]map[string]interface{}
+    vectors         map[uint64][]float32
+    duckdb          *DuckDB
+    dbConn          *DuckDBConn
+    // Additional fields omitted for brevity
 }
 ```
 
-- **HNSW Implementation**: Optimized C++ core with Go bindings
-- **Dual Distance Metrics**: Cosine similarity and L2 (Euclidean)
-- **Tunable Parameters**: M, efConstruction, efSearch for performance vs accuracy
-- **Memory-Mapped**: Efficient handling of large vector sets
-
-#### ⚡ Performance Optimizations
-
-- **Batch Processing**
+The HNSW graph is parameterized by several key configuration options:
 
 ```go
-  // Automatic batching for high-throughput ingestion
-  batchBuffer []vectorMeta
-  batchTicker *time.Ticker
-```
-
-- Background vector batching
-- Configurable flush intervals
-- Automatic batch size tuning
-
-- **Smart Caching**
-  - Two-tier metadata caching
-  - In-memory fast path
-  - DuckDB persistent storage
-
-#### 🏹 Arrow Integration
-
-```go
-// Native Arrow support for efficient data loading
-func (idx *Index) AppendFromArrow(rec arrow.Record) error {
-    // Direct zero-copy ingestion from Arrow
-    // Optimized batch processing
-    // Type-safe schema validation
+type Config struct {
+    Dimension       int
+    StoragePath     string
+    Distance        DistanceMetric
+    MaxElements     uint64
+    HNSWM           int // HNSW hyperparameter M
+    HNSWEfConstruct int // HNSW hyperparameter efConstruction
+    HNSWEfSearch    int // HNSW hyperparameter ef used during queries
+    BatchSize       int // Number of vectors to batch before insertion
+    // Additional fields omitted for brevity
 }
 ```
 
-#### 💾 Storage Engine
+The `HNSWM` parameter controls the maximum number of connections per node in the graph, while `HNSWEfConstruct` and `HNSWEfSearch` control the search breadth during index construction and query time, respectively. These parameters allow for fine-tuning the trade-off between search speed and accuracy.
 
-- **DuckDB Backend**
-  - SQL-powered metadata filtering
-  - ACID transactions
-  - JSON metadata support
-  - Efficient hybrid search
+### SQL Meets Vectors: The Metadata Store
 
-- **Persistence Layer**
+What sets Quiver apart isn't just fast vector search — it's fast vector search with real SQL filtering. That's where DuckDB comes in.
+
+Unlike traditional vector databases that rely on key-value stores or embedded document storage, Quiver uses DuckDB, an in-process analytical database built for speed. This gives us:
+
+- ✅ Full SQL Support → Complex metadata filtering, joins, and aggregations.
+- ✅ Columnar Storage → Optimized for analytical workloads, not just key-value lookups.
+- ✅ Blazing-Fast Queries → DuckDB is vectorized, meaning it processes queries in parallel with SIMD acceleration.
+- ✅ Minimal Overhead → No need for a heavyweight external database — DuckDB runs entirely in-memory when needed.
+
+Our DuckDB integration is designed to be lightweight but powerful, ensuring that metadata queries never become the bottleneck. This is what makes Quiver more than just a vector store — it's a vector-native database that actually understands your data.
+
+### Bridging the Gap with Apache Arrow
+
+HNSW handles fast vector search. ✅
+DuckDB gives us powerful SQL filtering. ✅
+
+But there's a missing piece: efficient data movement between them.
+
+Even with a blazing-fast vector index and a high-performance metadata store, Quiver needed a way to move data seamlessly between components — without serialization overhead, unnecessary memory copies, or slow conversion steps.
+
+That's where Apache Arrow comes in.
+
+#### Arrow as the Data Backbone
+
+Quiver doesn't just use DuckDB — it integrates with it at the memory level. Instead of relying on traditional row-based data movement (which would force slow conversions and copies), we use Arrow Database Connectivity (ADBC) to communicate directly with DuckDB in Arrow-native format.
 
 ```go
-  // Efficient save/load operations
-  func (idx *Index) Save(path string) error {
-      // Memory-mapped index persistence
-      // Atomic metadata updates
-      // Crash-safe operations
-  }
+type DuckDB struct {
+    mu     sync.Mutex
+    db     adbc.Database
+    driver adbc.Driver
+    opts   DuckDBOptions
+    conns  []*DuckDBConn
+}
+
+type DuckDBConn struct {
+    parent *DuckDB
+    conn   adbc.Connection
+}
 ```
 
-#### 🛡️ Production Safeguards
+With ADBC, metadata queries return results as Arrow RecordBatches, which can be processed without ever leaving columnar memory. This means that vector search results and metadata lookups stay fast, efficient, and zero-copy.
 
-- **Resource Management**
-  - Graceful shutdown handling
-  - Connection pooling
-  - Memory-aware batching
-  - Automatic cleanup
+#### Why Apache Arrow?
 
-- **Type Safety**
-  - Strict dimension validation
-  - Schema enforcement
-  - Error handling with context
+Most vector databases waste CPU cycles shuffling bytes around — loading, converting, and copying data between different formats. Arrow eliminates this problem by keeping everything in a single, efficient memory format.
 
-Whether you're processing millions of vectors or running complex hybrid queries, Quiver's core is optimized for your workload—right on your machine.
+Here's why that matters:
+
+- ✅ Zero-Copy Data Transfer → No serialization/deserialization overhead when moving data between Quiver's components.
+- ✅ Columnar Storage Efficiency → DuckDB and Arrow both use columnar formats, making queries and analytics dramatically faster.
+- ✅ Interoperability → Because Arrow is a standard, Quiver can integrate seamlessly with Python, PostgreSQL, Spark, and other modern data tools.
+- ✅ SIMD-Optimized Execution → Arrow enables vectorized processing, meaning modern CPUs can scan and compute over large datasets much faster.
+
+#### How Quiver Uses Arrow
+
+We leverage Arrow in two key areas:
+
+1️⃣ **Ingesting Data** → Bulk-loading vectors and metadata without format conversion.
+2️⃣ **Query Results** → Returning search results in an Arrow-native format, making downstream processing in analytics engines or ML pipelines much faster.
+
+By eliminating data movement bottlenecks, Arrow makes Quiver more than just a vector search engine — it's a high-performance data pipeline that fits seamlessly into modern AI and analytics stacks.
+
+## Hybrid Search: Vector Similarity Meets SQL Filtering
+
+Raw vector search is powerful — but it's not enough.
+
+Real-world use cases demand more than just similarity matching. You don't just want to find the most similar product images — you want to filter by price, category, stock status, or user preferences.
+
+That's what makes Quiver different.
+
+By combining HNSW for vector search with DuckDB for structured filtering, Quiver enables hybrid search — queries that mix semantic similarity with SQL-based constraints in a way that's both fast and flexible.
+
+For example:
+
+🔍 Find the 10 most similar product images, but only include products that are in stock and priced under $50.
+
+This kind of query is impossible in most vector databases without pre-filtering or complex workarounds. Quiver makes it seamless.
+
+### Two Approaches to Hybrid Search
+
+Quiver supports two ways to combine vector search with metadata filtering, depending on the use case:
+
+1️⃣ **Pre-Filtering (SQL First, Vector Search Later)**
+
+When metadata constraints are highly selective, Quiver filters first — using DuckDB to narrow down the dataset before running vector search on a smaller set of candidates.
+
+```go
+func (idx *Index) SearchWithFilter(query []float32, k int, filter string) ([]SearchResult, error) {
+    // Execute SQL filter query
+    filteredIDs, err := idx.executeFilterQuery(filter)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Perform vector search on filtered subset
+    results, err := idx.searchFiltered(query, k, filteredIDs)
+    if err != nil {
+        return nil, err
+    }
+    
+    return results, nil
+}
+```
+
+✅ Best for: Narrowing down a large dataset when the metadata filter eliminates most records.
+
+2️⃣ **Post-Filtering (Vector Search First, SQL Later)**
+
+When vector similarity is the dominant factor, Quiver runs the ANN search first, then filters the results using DuckDB.
+
+```go
+func (idx *Index) SearchWithPostFilter(query []float32, k int, filter string) ([]SearchResult, error) {
+    // Perform vector search with a larger k to account for filtering
+    results, err := idx.Search(query, k*2, 0, 0)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Extract IDs for filtering
+    ids := make([]uint64, len(results))
+    for i, r := range results {
+        ids[i] = r.ID
+    }
+    
+    // Apply filter to results
+    filteredResults, err := idx.filterResults(ids, filter, k)
+    if err != nil {
+        return nil, err
+    }
+    
+    return filteredResults, nil
+}
+```
+
+✅ Best for: Cases where the vector search results are already highly relevant, and metadata filtering is secondary.
+
+### How Quiver Optimizes Hybrid Search
+
+Quiver doesn't just run both steps in sequence — it chooses the best approach dynamically based on the query.
+
+- If the metadata filter is highly selective → Pre-filtering is faster.
+- If the metadata filter is loose → Post-filtering avoids unnecessary constraints.
+
+By intelligently switching between these approaches, Quiver avoids the performance pitfalls that make hybrid search slow in other databases.
+
+The result? A system that feels as fast as raw vector search but acts as flexible as a SQL database.
+
+## Making Quiver Fast at Scale
+
+Building a vector database is one thing — making it fast and scalable is another.
+
+Quiver isn't just optimized for raw search speed. We've engineered it for high-throughput inserts, low-latency queries, and efficient storage — without unnecessary overhead.
+
+Here's how we make it fast.
+
+### 1️⃣ Batch Processing for High-Speed Ingestion
+
+Vector addition needs to be fast and scalable, especially when ingesting large datasets. Instead of inserting vectors one by one, Quiver batches inserts to improve throughput.
+
+Each new vector is added to a buffer, which is flushed in bulk once it reaches the configured batch size:
+
+```go
+func (idx *Index) Add(id uint64, vector []float32, meta map[string]interface{}) error {
+    // Add to batch buffer
+    idx.batchLock.Lock()
+    idx.batchBuffer = append(idx.batchBuffer, vectorMeta{
+        id:     id,
+        vector: vector,
+        meta:   meta,
+    })
+    idx.batchLock.Unlock()
+    
+    // Flush batch if it reaches the configured size
+    if len(idx.batchBuffer) >= idx.config.BatchSize {
+        return idx.flushBatch()
+    }
+    
+    return nil
+}
+```
+
+A background goroutine automatically flushes the batch buffer, ensuring optimal insert performance without blocking writes.
+
+✅ Why it matters: Batching minimizes disk I/O and computational overhead, making bulk imports orders of magnitude faster than inserting vectors individually.
+
+### 2️⃣ Caching for Low-Latency Metadata Lookups
+
+Metadata filtering is a key feature of Quiver, but repeated database queries can slow things down.
+
+To avoid unnecessary lookups, Quiver caches metadata in memory:
+
+```go
+func (idx *Index) getMetadata(id uint64) map[string]interface{} {
+    // Check cache first
+    if meta, ok := idx.cache.Load(id); ok {
+        return meta.(map[string]interface{})
+    }
+    
+    // Fetch from database if not in cache
+    idx.lock.RLock()
+    meta, exists := idx.metadata[id]
+    idx.lock.RUnlock()
+    
+    if exists {
+        // Store in cache for future use
+        idx.cache.Store(id, meta)
+        return meta
+    }
+    
+    return nil
+}
+```
+
+✅ Why it matters: Instead of hitting DuckDB for every query, Quiver retrieves frequently accessed metadata from memory, significantly reducing query latency.
+
+### 3️⃣ Efficient Persistence and Backup
+
+Speed is important, but so is data durability.
+
+Quiver supports efficient persistence and backup mechanisms to ensure that vector indices and metadata aren't lost.
+
+```go
+func (idx *Index) persistToStorage() error {
+    // Implementation details for persisting the index to disk
+}
+
+func (idx *Index) Backup(path string, incremental bool, compress bool) error {
+    // Implementation details for creating backups
+}
+```
+
+- 🔹 Incremental backups → Store only what's changed, minimizing storage costs.
+- 🔹 Compression options → Reduce disk space usage without compromising speed.
+
+✅ Why it matters: Quiver provides persistence without sacrificing performance, ensuring that large-scale vector indices remain both durable and efficient.
+
+## How Fast is Quiver?
+
+Speed isn't just a feature — it's the foundation of a great vector database.
+
+We built Quiver to handle high-throughput inserts, low-latency queries, and efficient hybrid search without the performance bottlenecks that plague traditional solutions. Here's what that looks like in practice (benchmarked on an M2 Pro CPU):
+
+- ✅ Fast Vector Search → 16.9K queries per second with 59µs latency.
+- ✅ Hybrid Search (Vectors + SQL Filtering) → 4.8K queries per second with 208µs latency.
+- ✅ Negative Search (Exclusion-based ranking) → 7.9K queries per second, dynamically reranking results in 126µs.
+- ✅ Batch Inserts (1,000 vectors at a time) → 6.6 batches per second, processing 19MB per batch.
+
+For real-time applications, sub-millisecond query times mean Quiver can scale effortlessly across millions of vectors. Whether you're handling embeddings for AI-powered search, large-scale recommendations, or anomaly detection, Quiver delivers speed without compromise.
+
+## Use Cases
+
+Quiver's hybrid search capabilities allow you to go beyond simple vector similarity by incorporating metadata filtering, ranking, and exclusion-based logic in a single query.
+
+Let's explore two powerful use cases:
+
+🔹 **Simple Example: Find Relevant Documents**
+
+A basic use case for Quiver is semantic search with filtering — for example, retrieving the most relevant news articles published in the past week.
+
+```go
+// Find documents similar to the query that were published in the last 7 days
+results, err := index.SearchWithFilter(
+    queryVector,
+    10,
+    "published_date > DATE_SUB(NOW(), INTERVAL 7 DAY)"
+)
+```
+
+This ensures only recent documents are returned while still ranking results based on vector similarity.
+
+🔹 **Advanced Example: Negative Search (Excluding Irrelevant Matches)**
+
+In many applications, it's not enough to just find similar items — you also need to exclude certain results.
+
+For example, a recommendation system might want to:
+
+- Find items similar to what a user likes ✅
+- Exclude items they've already purchased ❌
+- Avoid items that match known negative preferences ❌
+
+Instead of filtering metadata after the fact, Quiver reranks results in the vector space, actively pushing down unwanted matches using a negative search query.
+
+```go
+// Find movies similar to what the user likes but exclude those they disliked
+results, err := index.SearchWithNegatives(
+    likedMovieVector,    // Positive query
+    dislikedMovieVectors, // Negative queries
+    10, 1, 10,          // k, page, pageSize
+)
+```
+
+Under the hood, Quiver:
+
+- ✅ Performs a high-recall vector search to find candidates
+- ✅ Computes similarity to both positive and negative examples
+- ✅ Reranks results, pushing down items similar to the negative examples
+
+This approach improves recommendation accuracy, ensuring the user sees highly relevant, non-repetitive results.
+
+### Why Negative Search Matters
+
+Most vector databases can't handle exclusion-based ranking efficiently — forcing developers to run multiple queries and manually filter results.
+
+Quiver's built-in negative search allows:
+
+- ✅ Personalized recommendations (exclude previously seen or irrelevant items)
+- ✅ Bias reduction in search results (downweight unwanted clusters)
+- ✅ More diverse results by actively discouraging over-represented embeddings
+
+## The Future of Hybrid Search is Here
+
+Quiver isn't just another vector database. It's a fundamental rethink of what's possible when you combine fast similarity search, real SQL filtering, and zero-copy data movement into a single, high-performance system.
+
+Instead of forcing trade-offs between speed and flexibility, Quiver embraces both, enabling hybrid search that feels natural and runs at scale.
+
+We built Quiver because we saw an opportunity to do things differently — to eliminate bottlenecks, remove complexity, and provide a vector-native database that integrates seamlessly into modern AI and analytics stacks.
+
+And this is just the beginning.
+
+## Get Involved
+
+Quiver is open source. That means you can:
+
+- ✅ Try it today → Get started with a few lines of Go.
+- ✅ Contribute → Help shape the future of hybrid vector search.
+- ✅ Join the discussion → We're building this in the open, and we want your feedback.
