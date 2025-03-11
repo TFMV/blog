@@ -114,7 +114,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#quiver" class="md-skip">
+        <a href="#building-a-hybrid-vector-search-database-with-arrow-and-duckdb" class="md-skip">
           Skip to content
         </a>
       
@@ -388,6 +388,8 @@
       
         
       
+        
+      
     
     
       
@@ -479,6 +481,28 @@
   
   <span class="md-ellipsis">
     Billion
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../blink/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blink
     
   </span>
   
@@ -697,405 +721,325 @@
   
 
 
-<h1 id="quiver">Quiver<a class="headerlink" href="#quiver" title="Permanent link">#</a></h1>
-<p>A local-first vector database combining structured queries with high-speed similarity search—without the complexity of distributed systems.</p>
-<h2 id="the-vector-search-problem">The Vector Search Problem<a class="headerlink" href="#the-vector-search-problem" title="Permanent link">#</a></h2>
-<p>Picture this: You&rsquo;ve built an amazing AI application that needs vector search. The usual choices? Heavyweight vector databases that demand a fleet of machines—or barebones libraries that can&rsquo;t handle metadata, filtering, or hybrid queries.</p>
-<p>Why is there no SQLite for vector search?<br />
-Something lightweight. Something fast. Something that just works.</p>
-<p>Every day, developers face this challenge:</p>
+<h1 id="building-a-hybrid-vector-search-database-with-arrow-and-duckdb">Building a Hybrid Vector Search Database with Arrow and DuckDB<a class="headerlink" href="#building-a-hybrid-vector-search-database-with-arrow-and-duckdb" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="how-we-combined-hnsw-for-fast-vector-search-with-sql-based-metadata-filtering-for-a-next-gen-ai-database">How we combined HNSW for fast vector search with SQL-based metadata filtering for a next-gen AI database<a class="headerlink" href="#how-we-combined-hnsw-for-fast-vector-search-with-sql-based-metadata-filtering-for-a-next-gen-ai-database" title="Permanent link">#</a></h2>
+<p>Vector databases are no longer optional. As embeddings-based applications explode across industries, developers need speed, flexibility, and efficiency when storing, searching, and retrieving high-dimensional vectors. But here&rsquo;s the problem:</p>
+<p>Most vector databases force you to choose between raw performance and SQL-powered filtering.</p>
+<p>That&rsquo;s why we built Quiver — a Go-powered, hybrid vector database that delivers the best of both worlds:</p>
 <ul>
-<li>Heavyweight databases designed for clusters you don&rsquo;t need</li>
-<li>Basic libraries that can&rsquo;t handle structured data alongside vectors</li>
-<li>The choice between power and simplicity</li>
-<li>Infrastructure complexity that gets in the way of building</li>
+<li>✅ HNSW for fast, high-recall vector search</li>
+<li>✅ DuckDB for structured metadata filtering</li>
+<li>✅ Apache Arrow for efficient, zero-copy data movement</li>
 </ul>
-<h2 id="quiver-vector-search-meets-simplicity">Quiver: Vector Search Meets Simplicity<a class="headerlink" href="#quiver-vector-search-meets-simplicity" title="Permanent link">#</a></h2>
-<p>Quiver is what happens when vector search meets simplicity:</p>
+<p>With Quiver, you can run complex queries that mix vector similarity with structured constraints — without killing performance.</p>
+<p>This article isn&rsquo;t just a high-level introduction. We&rsquo;re diving deep into the internals — how I integrated Apache Arrow, optimized DuckDB for metadata management, and built a high-speed HNSW index — to create a vector search engine that doesn&rsquo;t compromise.</p>
+<p>Let&rsquo;s get into it.</p>
+<h2 id="vector-databases-have-a-problem">Vector Databases Have a Problem<a class="headerlink" href="#vector-databases-have-a-problem" title="Permanent link">#</a></h2>
+<p>Vector databases are critical infrastructure for AI applications — powering everything from semantic search and recommendation systems to image similarity and anomaly detection. But despite their importance, most solutions come with serious trade-offs.</p>
+<h3 id="where-existing-vector-databases-fall-short">Where Existing Vector Databases Fall Short<a class="headerlink" href="#where-existing-vector-databases-fall-short" title="Permanent link">#</a></h3>
 <ul>
-<li>Blazing-fast HNSW for high-performance similarity search</li>
-<li>DuckDB-style local-first indexing—fast hybrid search without clusters</li>
-<li>SQL-like filtering alongside vector search</li>
-<li>Low overhead—runs on your laptop, embedded in applications, or on-prem</li>
+<li>🔥 <strong>Performance vs. Flexibility Trade-offs</strong> → Most vector databases are built for either fast similarity search or rich metadata filtering — not both. If you want speed, you lose SQL-style filtering. If you want SQL filtering, you lose performance.</li>
+<li>🔥 <strong>Heavy Resource Consumption</strong> → Many solutions demand huge memory and CPU overhead to maintain vector indices, making them expensive at scale.</li>
+<li>🔥 <strong>Operational Complexity</strong> → Most vector databases require careful tuning, background maintenance processes, and periodic reindexing to stay performant.</li>
+<li>🔥 <strong>Integration Challenges</strong> → Existing solutions often sit outside an organization&rsquo;s primary data stack, requiring custom pipelines and workarounds to sync with relational databases and analytical engines.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="c1"># Get started in two commands</span>
-go<span class="w"> </span>get<span class="w"> </span>github.com/TFMV/quiver
-quiver<span class="w"> </span>serve
+<h3 id="how-existing-solutions-approach-the-problem">How Existing Solutions Approach the Problem<a class="headerlink" href="#how-existing-solutions-approach-the-problem" title="Permanent link">#</a></h3>
+<p>Current vector search solutions take different approaches, each with trade-offs:</p>
+<ul>
+<li><strong>Weaviate</strong> → Uses HNSW for vector search with a GraphQL-based query engine. Weaviate allows metadata filtering but stores metadata in RocksDB, which comes with additional operational overhead.</li>
+<li><strong>Pinecone</strong> → A managed service optimized for fast retrieval, but you lose control over the underlying infrastructure and can&rsquo;t easily run it locally.</li>
+<li><strong>FAISS</strong> → A highly optimized C++ library for pure vector search — but lacks a built-in metadata store, requiring developers to pair it with an external database.</li>
+<li><strong>pgvector</strong> → Brings vector search inside PostgreSQL, enabling SQL-based filtering, but scales poorly on large datasets due to PostgreSQL&rsquo;s row-based storage.</li>
+</ul>
+<h2 id="why-we-built-quiver">Why We Built Quiver<a class="headerlink" href="#why-we-built-quiver" title="Permanent link">#</a></h2>
+<p>We wanted a vector database that didn&rsquo;t force these trade-offs — one that keeps up with the best ANN search engines while supporting rich, efficient metadata filtering.</p>
+<ul>
+<li>✅ HNSW for high-speed vector search</li>
+<li>✅ DuckDB for SQL-powered metadata filtering</li>
+<li>✅ Apache Arrow for zero-copy, high-performance data movement</li>
+</ul>
+<p>Quiver avoids the overhead of external databases, scales efficiently, and fits seamlessly into modern AI and analytics stacks. Let&rsquo;s break down how it works.</p>
+<h2 id="under-the-hood">Under the Hood<a class="headerlink" href="#under-the-hood" title="Permanent link">#</a></h2>
+<p>Quiver is built on three key components, each designed to maximize speed, flexibility, and efficiency:</p>
+<p>1️⃣ <strong>Vector Index</strong> → An HNSW (Hierarchical Navigable Small World) graph for fast approximate nearest neighbor (ANN) search.<br />
+2️⃣ <strong>Metadata Store</strong> → A DuckDB-backed SQL engine for structured metadata filtering.<br />
+3️⃣ <strong>Arrow Appender</strong> → A zero-copy data pipeline powered by Apache Arrow, keeping everything memory-efficient and fast.</p>
+<p>These pieces work together to eliminate the trade-offs most vector databases force you to make — allowing queries that combine vector similarity with structured constraints without wrecking performance.</p>
+<h3 id="blazing-fast-search-the-vector-index">Blazing-Fast Search: The Vector Index<a class="headerlink" href="#blazing-fast-search-the-vector-index" title="Permanent link">#</a></h3>
+<p>At the core of Quiver&rsquo;s vector search engine is HNSW (Hierarchical Navigable Small World) — a graph-based ANN algorithm built for speed and scalability.</p>
+<p>HNSW is what makes Quiver&rsquo;s search both fast and accurate, offering logarithmic search complexity while keeping recall high. It works by constructing a multi-layered graph where similar vectors cluster together, drastically reducing the number of comparisons needed for a query.</p>
+<p>Our Go-based implementation of HNSW is optimized for:</p>
+<ul>
+<li>✅ Memory efficiency → Minimizing index size without sacrificing recall.</li>
+<li>✅ High-speed inserts → Batch processing for fast vector ingestion.</li>
+<li>✅ Precision tuning → Fine-grained control over search parameters for balancing speed vs. accuracy.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">Index</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">config</span><span class="w">          </span><span class="nx">Config</span>
+<span class="w">    </span><span class="nx">hnsw</span><span class="w">            </span><span class="o">*</span><span class="nx">hnsw</span><span class="p">.</span><span class="nx">Graph</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span>
+<span class="w">    </span><span class="nx">metadata</span><span class="w">        </span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span>
+<span class="w">    </span><span class="nx">vectors</span><span class="w">         </span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">][]</span><span class="kt">float32</span>
+<span class="w">    </span><span class="nx">duckdb</span><span class="w">          </span><span class="o">*</span><span class="nx">DuckDB</span>
+<span class="w">    </span><span class="nx">dbConn</span><span class="w">          </span><span class="o">*</span><span class="nx">DuckDBConn</span>
+<span class="w">    </span><span class="c1">// Additional fields omitted for brevity</span>
+<span class="p">}</span>
 </code></pre></div>
-<h2 id="why-quiver-the-speed-you-need-the-simplicity-you-want">Why Quiver? The Speed You Need, The Simplicity You Want<a class="headerlink" href="#why-quiver-the-speed-you-need-the-simplicity-you-want" title="Permanent link">#</a></h2>
-<h3 id="lightning-fast-local-search">🚀 Lightning-Fast Local Search<a class="headerlink" href="#lightning-fast-local-search" title="Permanent link">#</a></h3>
-<p>Quiver&rsquo;s HNSW implementation isn&rsquo;t just fast—it&rsquo;s optimized for single-node performance:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Find similar vectors in microseconds, right on your machine</span>
-<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Search</span><span class="p">(</span><span class="nx">queryVector</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+<p>The HNSW graph is parameterized by several key configuration options:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">Config</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">Dimension</span><span class="w">       </span><span class="kt">int</span>
+<span class="w">    </span><span class="nx">StoragePath</span><span class="w">     </span><span class="kt">string</span>
+<span class="w">    </span><span class="nx">Distance</span><span class="w">        </span><span class="nx">DistanceMetric</span>
+<span class="w">    </span><span class="nx">MaxElements</span><span class="w">     </span><span class="kt">uint64</span>
+<span class="w">    </span><span class="nx">HNSWM</span><span class="w">           </span><span class="kt">int</span><span class="w"> </span><span class="c1">// HNSW hyperparameter M</span>
+<span class="w">    </span><span class="nx">HNSWEfConstruct</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="c1">// HNSW hyperparameter efConstruction</span>
+<span class="w">    </span><span class="nx">HNSWEfSearch</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="c1">// HNSW hyperparameter ef used during queries</span>
+<span class="w">    </span><span class="nx">BatchSize</span><span class="w">       </span><span class="kt">int</span><span class="w"> </span><span class="c1">// Number of vectors to batch before insertion</span>
+<span class="w">    </span><span class="c1">// Additional fields omitted for brevity</span>
+<span class="p">}</span>
 </code></pre></div>
-<h3 id="hybrid-search-that-just-works">🎯 Hybrid Search That Just Works<a class="headerlink" href="#hybrid-search-that-just-works" title="Permanent link">#</a></h3>
-<p>Combine vector similarity with structured filters, all processed locally:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Find similar science articles from last week</span>
+<p>The <code>HNSWM</code> parameter controls the maximum number of connections per node in the graph, while <code>HNSWEfConstruct</code> and <code>HNSWEfSearch</code> control the search breadth during index construction and query time, respectively. These parameters allow for fine-tuning the trade-off between search speed and accuracy.</p>
+<h3 id="sql-meets-vectors-the-metadata-store">SQL Meets Vectors: The Metadata Store<a class="headerlink" href="#sql-meets-vectors-the-metadata-store" title="Permanent link">#</a></h3>
+<p>What sets Quiver apart isn&rsquo;t just fast vector search — it&rsquo;s fast vector search with real SQL filtering. That&rsquo;s where DuckDB comes in.</p>
+<p>Unlike traditional vector databases that rely on key-value stores or embedded document storage, Quiver uses DuckDB, an in-process analytical database built for speed. This gives us:</p>
+<ul>
+<li>✅ Full SQL Support → Complex metadata filtering, joins, and aggregations.</li>
+<li>✅ Columnar Storage → Optimized for analytical workloads, not just key-value lookups.</li>
+<li>✅ Blazing-Fast Queries → DuckDB is vectorized, meaning it processes queries in parallel with SIMD acceleration.</li>
+<li>✅ Minimal Overhead → No need for a heavyweight external database — DuckDB runs entirely in-memory when needed.</li>
+</ul>
+<p>Our DuckDB integration is designed to be lightweight but powerful, ensuring that metadata queries never become the bottleneck. This is what makes Quiver more than just a vector store — it&rsquo;s a vector-native database that actually understands your data.</p>
+<h3 id="bridging-the-gap-with-apache-arrow">Bridging the Gap with Apache Arrow<a class="headerlink" href="#bridging-the-gap-with-apache-arrow" title="Permanent link">#</a></h3>
+<p>HNSW handles fast vector search. ✅<br />
+DuckDB gives us powerful SQL filtering. ✅</p>
+<p>But there&rsquo;s a missing piece: efficient data movement between them.</p>
+<p>Even with a blazing-fast vector index and a high-performance metadata store, Quiver needed a way to move data seamlessly between components — without serialization overhead, unnecessary memory copies, or slow conversion steps.</p>
+<p>That&rsquo;s where Apache Arrow comes in.</p>
+<h4 id="arrow-as-the-data-backbone">Arrow as the Data Backbone<a class="headerlink" href="#arrow-as-the-data-backbone" title="Permanent link">#</a></h4>
+<p>Quiver doesn&rsquo;t just use DuckDB — it integrates with it at the memory level. Instead of relying on traditional row-based data movement (which would force slow conversions and copies), we use Arrow Database Connectivity (ADBC) to communicate directly with DuckDB in Arrow-native format.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">DuckDB</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">mu</span><span class="w">     </span><span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+<span class="w">    </span><span class="nx">db</span><span class="w">     </span><span class="nx">adbc</span><span class="p">.</span><span class="nx">Database</span>
+<span class="w">    </span><span class="nx">driver</span><span class="w"> </span><span class="nx">adbc</span><span class="p">.</span><span class="nx">Driver</span>
+<span class="w">    </span><span class="nx">opts</span><span class="w">   </span><span class="nx">DuckDBOptions</span>
+<span class="w">    </span><span class="nx">conns</span><span class="w">  </span><span class="p">[]</span><span class="o">*</span><span class="nx">DuckDBConn</span>
+<span class="p">}</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">DuckDBConn</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">parent</span><span class="w"> </span><span class="o">*</span><span class="nx">DuckDB</span>
+<span class="w">    </span><span class="nx">conn</span><span class="w">   </span><span class="nx">adbc</span><span class="p">.</span><span class="nx">Connection</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>With ADBC, metadata queries return results as Arrow RecordBatches, which can be processed without ever leaving columnar memory. This means that vector search results and metadata lookups stay fast, efficient, and zero-copy.</p>
+<h4 id="why-apache-arrow">Why Apache Arrow?<a class="headerlink" href="#why-apache-arrow" title="Permanent link">#</a></h4>
+<p>Most vector databases waste CPU cycles shuffling bytes around — loading, converting, and copying data between different formats. Arrow eliminates this problem by keeping everything in a single, efficient memory format.</p>
+<p>Here&rsquo;s why that matters:</p>
+<ul>
+<li>✅ Zero-Copy Data Transfer → No serialization/deserialization overhead when moving data between Quiver&rsquo;s components.</li>
+<li>✅ Columnar Storage Efficiency → DuckDB and Arrow both use columnar formats, making queries and analytics dramatically faster.</li>
+<li>✅ Interoperability → Because Arrow is a standard, Quiver can integrate seamlessly with Python, PostgreSQL, Spark, and other modern data tools.</li>
+<li>✅ SIMD-Optimized Execution → Arrow enables vectorized processing, meaning modern CPUs can scan and compute over large datasets much faster.</li>
+</ul>
+<h4 id="how-quiver-uses-arrow">How Quiver Uses Arrow<a class="headerlink" href="#how-quiver-uses-arrow" title="Permanent link">#</a></h4>
+<p>We leverage Arrow in two key areas:</p>
+<p>1️⃣ <strong>Ingesting Data</strong> → Bulk-loading vectors and metadata without format conversion.<br />
+2️⃣ <strong>Query Results</strong> → Returning search results in an Arrow-native format, making downstream processing in analytics engines or ML pipelines much faster.</p>
+<p>By eliminating data movement bottlenecks, Arrow makes Quiver more than just a vector search engine — it&rsquo;s a high-performance data pipeline that fits seamlessly into modern AI and analytics stacks.</p>
+<h2 id="hybrid-search-vector-similarity-meets-sql-filtering">Hybrid Search: Vector Similarity Meets SQL Filtering<a class="headerlink" href="#hybrid-search-vector-similarity-meets-sql-filtering" title="Permanent link">#</a></h2>
+<p>Raw vector search is powerful — but it&rsquo;s not enough.</p>
+<p>Real-world use cases demand more than just similarity matching. You don&rsquo;t just want to find the most similar product images — you want to filter by price, category, stock status, or user preferences.</p>
+<p>That&rsquo;s what makes Quiver different.</p>
+<p>By combining HNSW for vector search with DuckDB for structured filtering, Quiver enables hybrid search — queries that mix semantic similarity with SQL-based constraints in a way that&rsquo;s both fast and flexible.</p>
+<p>For example:</p>
+<p>🔍 Find the 10 most similar product images, but only include products that are in stock and priced under $50.</p>
+<p>This kind of query is impossible in most vector databases without pre-filtering or complex workarounds. Quiver makes it seamless.</p>
+<h3 id="two-approaches-to-hybrid-search">Two Approaches to Hybrid Search<a class="headerlink" href="#two-approaches-to-hybrid-search" title="Permanent link">#</a></h3>
+<p>Quiver supports two ways to combine vector search with metadata filtering, depending on the use case:</p>
+<p>1️⃣ <strong>Pre-Filtering (SQL First, Vector Search Later)</strong></p>
+<p>When metadata constraints are highly selective, Quiver filters first — using DuckDB to narrow down the dataset before running vector search on a smaller set of candidates.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">SearchWithFilter</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">,</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="nx">SearchResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Execute SQL filter query</span>
+<span class="w">    </span><span class="nx">filteredIDs</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">executeFilterQuery</span><span class="p">(</span><span class="nx">filter</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Perform vector search on filtered subset</span>
+<span class="w">    </span><span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">searchFiltered</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">k</span><span class="p">,</span><span class="w"> </span><span class="nx">filteredIDs</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>✅ Best for: Narrowing down a large dataset when the metadata filter eliminates most records.</p>
+<p>2️⃣ <strong>Post-Filtering (Vector Search First, SQL Later)</strong></p>
+<p>When vector similarity is the dominant factor, Quiver runs the ANN search first, then filters the results using DuckDB.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">SearchWithPostFilter</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">,</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="nx">SearchResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Perform vector search with a larger k to account for filtering</span>
+<span class="w">    </span><span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">Search</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">k</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Extract IDs for filtering</span>
+<span class="w">    </span><span class="nx">ids</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">uint64</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">results</span><span class="p">))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">ids</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">ID</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Apply filter to results</span>
+<span class="w">    </span><span class="nx">filteredResults</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">filterResults</span><span class="p">(</span><span class="nx">ids</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="p">,</span><span class="w"> </span><span class="nx">k</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">filteredResults</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>✅ Best for: Cases where the vector search results are already highly relevant, and metadata filtering is secondary.</p>
+<h3 id="how-quiver-optimizes-hybrid-search">How Quiver Optimizes Hybrid Search<a class="headerlink" href="#how-quiver-optimizes-hybrid-search" title="Permanent link">#</a></h3>
+<p>Quiver doesn&rsquo;t just run both steps in sequence — it chooses the best approach dynamically based on the query.</p>
+<ul>
+<li>If the metadata filter is highly selective → Pre-filtering is faster.</li>
+<li>If the metadata filter is loose → Post-filtering avoids unnecessary constraints.</li>
+</ul>
+<p>By intelligently switching between these approaches, Quiver avoids the performance pitfalls that make hybrid search slow in other databases.</p>
+<p>The result? A system that feels as fast as raw vector search but acts as flexible as a SQL database.</p>
+<h2 id="making-quiver-fast-at-scale">Making Quiver Fast at Scale<a class="headerlink" href="#making-quiver-fast-at-scale" title="Permanent link">#</a></h2>
+<p>Building a vector database is one thing — making it fast and scalable is another.</p>
+<p>Quiver isn&rsquo;t just optimized for raw search speed. We&rsquo;ve engineered it for high-throughput inserts, low-latency queries, and efficient storage — without unnecessary overhead.</p>
+<p>Here&rsquo;s how we make it fast.</p>
+<h3 id="1-batch-processing-for-high-speed-ingestion">1️⃣ Batch Processing for High-Speed Ingestion<a class="headerlink" href="#1-batch-processing-for-high-speed-ingestion" title="Permanent link">#</a></h3>
+<p>Vector addition needs to be fast and scalable, especially when ingesting large datasets. Instead of inserting vectors one by one, Quiver batches inserts to improve throughput.</p>
+<p>Each new vector is added to a buffer, which is flushed in bulk once it reaches the configured batch size:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">Add</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">uint64</span><span class="p">,</span><span class="w"> </span><span class="nx">vector</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Add to batch buffer</span>
+<span class="w">    </span><span class="nx">idx</span><span class="p">.</span><span class="nx">batchLock</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+<span class="w">    </span><span class="nx">idx</span><span class="p">.</span><span class="nx">batchBuffer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">append</span><span class="p">(</span><span class="nx">idx</span><span class="p">.</span><span class="nx">batchBuffer</span><span class="p">,</span><span class="w"> </span><span class="nx">vectorMeta</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">id</span><span class="p">:</span><span class="w">     </span><span class="nx">id</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">vector</span><span class="p">:</span><span class="w"> </span><span class="nx">vector</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">meta</span><span class="p">:</span><span class="w">   </span><span class="nx">meta</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="nx">idx</span><span class="p">.</span><span class="nx">batchLock</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Flush batch if it reaches the configured size</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">idx</span><span class="p">.</span><span class="nx">batchBuffer</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">BatchSize</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">flushBatch</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>A background goroutine automatically flushes the batch buffer, ensuring optimal insert performance without blocking writes.</p>
+<p>✅ Why it matters: Batching minimizes disk I/O and computational overhead, making bulk imports orders of magnitude faster than inserting vectors individually.</p>
+<h3 id="2-caching-for-low-latency-metadata-lookups">2️⃣ Caching for Low-Latency Metadata Lookups<a class="headerlink" href="#2-caching-for-low-latency-metadata-lookups" title="Permanent link">#</a></h3>
+<p>Metadata filtering is a key feature of Quiver, but repeated database queries can slow things down.</p>
+<p>To avoid unnecessary lookups, Quiver caches metadata in memory:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">getMetadata</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">uint64</span><span class="p">)</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Check cache first</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">cache</span><span class="p">.</span><span class="nx">Load</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">meta</span><span class="p">.(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Fetch from database if not in cache</span>
+<span class="w">    </span><span class="nx">idx</span><span class="p">.</span><span class="nx">lock</span><span class="p">.</span><span class="nx">RLock</span><span class="p">()</span>
+<span class="w">    </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">idx</span><span class="p">.</span><span class="nx">metadata</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span>
+<span class="w">    </span><span class="nx">idx</span><span class="p">.</span><span class="nx">lock</span><span class="p">.</span><span class="nx">RUnlock</span><span class="p">()</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Store in cache for future use</span>
+<span class="w">        </span><span class="nx">idx</span><span class="p">.</span><span class="nx">cache</span><span class="p">.</span><span class="nx">Store</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">meta</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>✅ Why it matters: Instead of hitting DuckDB for every query, Quiver retrieves frequently accessed metadata from memory, significantly reducing query latency.</p>
+<h3 id="3-efficient-persistence-and-backup">3️⃣ Efficient Persistence and Backup<a class="headerlink" href="#3-efficient-persistence-and-backup" title="Permanent link">#</a></h3>
+<p>Speed is important, but so is data durability.</p>
+<p>Quiver supports efficient persistence and backup mechanisms to ensure that vector indices and metadata aren&rsquo;t lost.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">persistToStorage</span><span class="p">()</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Implementation details for persisting the index to disk</span>
+<span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">Backup</span><span class="p">(</span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">incremental</span><span class="w"> </span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="nx">compress</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Implementation details for creating backups</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>🔹 Incremental backups → Store only what&rsquo;s changed, minimizing storage costs.</li>
+<li>🔹 Compression options → Reduce disk space usage without compromising speed.</li>
+</ul>
+<p>✅ Why it matters: Quiver provides persistence without sacrificing performance, ensuring that large-scale vector indices remain both durable and efficient.</p>
+<h2 id="how-fast-is-quiver">How Fast is Quiver?<a class="headerlink" href="#how-fast-is-quiver" title="Permanent link">#</a></h2>
+<p>Speed isn&rsquo;t just a feature — it&rsquo;s the foundation of a great vector database.</p>
+<p>We built Quiver to handle high-throughput inserts, low-latency queries, and efficient hybrid search without the performance bottlenecks that plague traditional solutions. Here&rsquo;s what that looks like in practice (benchmarked on an M2 Pro CPU):</p>
+<ul>
+<li>✅ Fast Vector Search → 16.9K queries per second with 59µs latency.</li>
+<li>✅ Hybrid Search (Vectors + SQL Filtering) → 4.8K queries per second with 208µs latency.</li>
+<li>✅ Negative Search (Exclusion-based ranking) → 7.9K queries per second, dynamically reranking results in 126µs.</li>
+<li>✅ Batch Inserts (1,000 vectors at a time) → 6.6 batches per second, processing 19MB per batch.</li>
+</ul>
+<p>For real-time applications, sub-millisecond query times mean Quiver can scale effortlessly across millions of vectors. Whether you&rsquo;re handling embeddings for AI-powered search, large-scale recommendations, or anomaly detection, Quiver delivers speed without compromise.</p>
+<h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">#</a></h2>
+<p>Quiver&rsquo;s hybrid search capabilities allow you to go beyond simple vector similarity by incorporating metadata filtering, ranking, and exclusion-based logic in a single query.</p>
+<p>Let&rsquo;s explore two powerful use cases:</p>
+<p>🔹 <strong>Simple Example: Find Relevant Documents</strong></p>
+<p>A basic use case for Quiver is semantic search with filtering — for example, retrieving the most relevant news articles published in the past week.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find documents similar to the query that were published in the last 7 days</span>
 <span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
 <span class="w">    </span><span class="nx">queryVector</span><span class="p">,</span>
 <span class="w">    </span><span class="mi">10</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;category = &#39;science&#39; AND date &gt; &#39;2024-03-10&#39;&quot;</span>
+<span class="w">    </span><span class="s">&quot;published_date &gt; DATE_SUB(NOW(), INTERVAL 7 DAY)&quot;</span>
 <span class="p">)</span>
 </code></pre></div>
-<h3 id="smart-local-processing">📦 Smart Local Processing<a class="headerlink" href="#smart-local-processing" title="Permanent link">#</a></h3>
-<p>Optimized for your machine&rsquo;s resources:</p>
+<p>This ensures only recent documents are returned while still ranking results based on vector similarity.</p>
+<p>🔹 <strong>Advanced Example: Negative Search (Excluding Irrelevant Matches)</strong></p>
+<p>In many applications, it&rsquo;s not enough to just find similar items — you also need to exclude certain results.</p>
+<p>For example, a recommendation system might want to:</p>
 <ul>
-<li>Efficient memory management</li>
-<li>Local metadata caching</li>
-<li>Background processing that respects your CPU</li>
+<li>Find items similar to what a user likes ✅</li>
+<li>Exclude items they&rsquo;ve already purchased ❌</li>
+<li>Avoid items that match known negative preferences ❌</li>
 </ul>
-<h3 id="local-batch-processing-with-arrow">🏹 Local Batch Processing with Arrow<a class="headerlink" href="#local-batch-processing-with-arrow" title="Permanent link">#</a></h3>
-<p>Native support for Apache Arrow means efficient local data handling:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Batch process vectors locally with Arrow</span>
-<span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">AppendFromArrow</span><span class="p">(</span><span class="nx">record</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="show-me-the-numbers">Show Me The Numbers<a class="headerlink" href="#show-me-the-numbers" title="Permanent link">#</a></h2>
-<p>How fast is Quiver?</p>
-<ul>
-<li>28,800 vector searches per second</li>
-<li>Hybrid search in &lt;0.5ms</li>
-<li>Batch processing at 10M+ vectors/sec</li>
-</ul>
-<p>Here are our benchmarks running on a standard 8-core laptop with 1M 128-dimensional vectors:</p>
-<table>
-<thead>
-<tr>
-<th>Operation</th>
-<th>Throughput</th>
-<th>Latency</th>
-<th>Memory/Op</th>
-<th>Allocs/Op</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Search</td>
-<td>28.8K ops/sec</td>
-<td>41µs</td>
-<td>1.5 KB</td>
-<td>18</td>
-</tr>
-<tr>
-<td>Hybrid Search</td>
-<td>2.5K ops/sec</td>
-<td>432µs</td>
-<td>7.5 KB</td>
-<td>278</td>
-</tr>
-<tr>
-<td>Add</td>
-<td>5.5K ops/sec</td>
-<td>3.2ms</td>
-<td>1.4 KB</td>
-<td>21</td>
-</tr>
-<tr>
-<td>Add Parallel</td>
-<td>4.5K ops/sec</td>
-<td>5.3ms</td>
-<td>1.3 KB</td>
-<td>20</td>
-</tr>
-<tr>
-<td>Arrow Append*</td>
-<td>100 ops/sec</td>
-<td>2.7s</td>
-<td>2.3 MB</td>
-<td>32,332</td>
-</tr>
-</tbody>
-</table>
-<h3 id="batch-ingestion-that-scales-without-clusters">Batch Ingestion That Scales Without Clusters<a class="headerlink" href="#batch-ingestion-that-scales-without-clusters" title="Permanent link">#</a></h3>
-<ul>
-<li>Append 100,000 vectors per operation with Arrow</li>
-<li>Optimized for local-first AI workloads, no distributed infrastructure required</li>
-<li>High throughput: 10M+ records/sec for structured metadata + vectors</li>
-</ul>
-<p>What these numbers mean in practice:</p>
-<ul>
-<li><strong>Fast local queries</strong>: 41µs latency on a single machine</li>
-<li><strong>Efficient memory use</strong>: Most operations need just 1.5KB of memory</li>
-<li><strong>Smart resource use</strong>: Parallel operations optimize your machine&rsquo;s capabilities</li>
-<li><strong>Local batch processing</strong>: Efficient data loading with Arrow</li>
-</ul>
-<h2 id="where-quiver-shines">Where Quiver Shines<a class="headerlink" href="#where-quiver-shines" title="Permanent link">#</a></h2>
-<h3 id="semantic-document-search">📚 Semantic Document Search<a class="headerlink" href="#semantic-document-search" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// Index a document with rich metadata</span>
-<span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="nx">docID</span><span class="p">,</span><span class="w"> </span><span class="nx">embedding</span><span class="p">,</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span>
-<span class="w">    </span><span class="s">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Understanding Vector Search&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jane Doe&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;AI&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;databases&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="s">&quot;readingTime&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<span class="p">})</span>
-</code></pre></div>
-<h3 id="smart-recommendations">🎯 Smart Recommendations<a class="headerlink" href="#smart-recommendations" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// Find similar products within price range</span>
-<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
-<span class="w">    </span><span class="nx">userPreferences</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">5</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;price BETWEEN 10 AND 50&quot;</span>
+<p>Instead of filtering metadata after the fact, Quiver reranks results in the vector space, actively pushing down unwanted matches using a negative search query.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Find movies similar to what the user likes but exclude those they disliked</span>
+<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithNegatives</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">likedMovieVector</span><span class="p">,</span><span class="w">    </span><span class="c1">// Positive query</span>
+<span class="w">    </span><span class="nx">dislikedMovieVectors</span><span class="p">,</span><span class="w"> </span><span class="c1">// Negative queries</span>
+<span class="w">    </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">          </span><span class="c1">// k, page, pageSize</span>
 <span class="p">)</span>
 </code></pre></div>
-<h3 id="visual-search">🖼️ Visual Search<a class="headerlink" href="#visual-search" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// Find similar images with specific attributes</span>
-<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
-<span class="w">    </span><span class="nx">imageEmbedding</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">10</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;resolution = &#39;HD&#39; AND style = &#39;minimalist&#39;&quot;</span>
-<span class="p">)</span>
-</code></pre></div>
-<h3 id="rag-applications">🤖 RAG Applications<a class="headerlink" href="#rag-applications" title="Permanent link">#</a></h3>
-<p>Perfect for Retrieval-Augmented Generation:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Find relevant context for LLM</span>
-<span class="nx">context</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">SearchWithFilter</span><span class="p">(</span>
-<span class="w">    </span><span class="nx">queryEmbedding</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">3</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;confidence &gt; 0.8&quot;</span>
-<span class="p">)</span>
-</code></pre></div>
-<h2 id="getting-started-two-minute-setup">Getting Started: Two-Minute Setup<a class="headerlink" href="#getting-started-two-minute-setup" title="Permanent link">#</a></h2>
-<h3 id="1-installation">1. Installation<a class="headerlink" href="#1-installation" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/TFMV/quiver
-</code></pre></div>
-<h3 id="2-initialize-your-index">2. Initialize Your Index<a class="headerlink" href="#2-initialize-your-index" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nx">index</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">quiver</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">quiver</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span>
-<span class="w">    </span><span class="nx">Dimension</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">StoragePath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vectors.db&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">MaxElements</span><span class="p">:</span><span class="w"> </span><span class="mi">100000</span><span class="p">,</span>
-<span class="p">})</span>
-</code></pre></div>
-<h3 id="3-start-searching">3. Start Searching<a class="headerlink" href="#3-start-searching" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// Add vectors with metadata</span>
-<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">vectorData</span><span class="p">,</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span>
-<span class="w">    </span><span class="s">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;science&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jane Doe&quot;</span><span class="p">,</span>
-<span class="p">})</span>
-
-<span class="c1">// Search with type safety</span>
-<span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">index</span><span class="p">.</span><span class="nx">Search</span><span class="p">(</span><span class="nx">queryVector</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="rest-api-language-agnostic-integration">REST API: Language-Agnostic Integration<a class="headerlink" href="#rest-api-language-agnostic-integration" title="Permanent link">#</a></h2>
-<p>No Go? No problem. Quiver speaks HTTP:</p>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/search/hybrid<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<span class="s1">    &quot;vector&quot;: [0.1, 0.2, ...],</span>
-<span class="s1">    &quot;k&quot;: 5,</span>
-<span class="s1">    &quot;filter&quot;: &quot;category = &#39;</span>science<span class="s1">&#39;&quot;</span>
-<span class="s1">  }&#39;</span>
-</code></pre></div>
-<h2 id="why-choose-quiver">Why Choose Quiver?<a class="headerlink" href="#why-choose-quiver" title="Permanent link">#</a></h2>
-<p>🚀 <strong>Zero setup</strong>—install &amp; search in minutes<br />
-⚡ <strong>Blazing-fast</strong>—sub-millisecond queries, even on a laptop<br />
-🛠️ <strong>Developer-friendly</strong>—Go SDK &amp; REST API<br />
-💡 <strong>No cloud lock-in</strong>—runs anywhere, no clusters required</p>
-<h2 id="whats-next">What&rsquo;s Next?<a class="headerlink" href="#whats-next" title="Permanent link">#</a></h2>
-<p>Your AI. Your Data. Your Machine.</p>
-<p>Fast, flexible vector search—no clusters, no overhead.<br />
-Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in production, Quiver gives you vector search that just works.</p>
-<p>Ready to simplify vector search? <a href="https://github.com/TFMV/quiver">Check out Quiver on GitHub</a>.</p>
-<hr />
-<h2 id="whats-under-the-hood">What&rsquo;s Under the Hood?<a class="headerlink" href="#whats-under-the-hood" title="Permanent link">#</a></h2>
-<p>Under the hood, Quiver combines HNSW-powered search with DuckDB-backed structured queries, wrapped in a production-ready Go API server and CLI. Here&rsquo;s how it all works together:</p>
-<h3 id="production-ready-api-server">Production-Ready API Server<a class="headerlink" href="#production-ready-api-server" title="Permanent link">#</a></h3>
-<p>Built with <a href="https://gofiber.io/">Fiber</a>—the Express-inspired, lightning-fast web framework for Go. Quiver&rsquo;s API server delivers production-grade performance and reliability out of the box.</p>
-<h4 id="battle-tested-reliability">🛡️ Battle-Tested Reliability<a class="headerlink" href="#battle-tested-reliability" title="Permanent link">#</a></h4>
+<p>Under the hood, Quiver:</p>
 <ul>
-<li>Graceful shutdown with connection draining</li>
-<li>Custom error handling with structured responses</li>
-<li>Middleware-driven architecture for extensibility</li>
-<li>Automatic panic recovery via Fiber middleware</li>
+<li>✅ Performs a high-recall vector search to find candidates</li>
+<li>✅ Computes similarity to both positive and negative examples</li>
+<li>✅ Reranks results, pushing down items similar to the negative examples</li>
 </ul>
-<h4 id="performance-optimized">⚡ Performance Optimized<a class="headerlink" href="#performance-optimized" title="Permanent link">#</a></h4>
+<p>This approach improves recommendation accuracy, ensuring the user sees highly relevant, non-repetitive results.</p>
+<h3 id="why-negative-search-matters">Why Negative Search Matters<a class="headerlink" href="#why-negative-search-matters" title="Permanent link">#</a></h3>
+<p>Most vector databases can&rsquo;t handle exclusion-based ranking efficiently — forcing developers to run multiple queries and manually filter results.</p>
+<p>Quiver&rsquo;s built-in negative search allows:</p>
 <ul>
-<li>Response compression via Fiber&rsquo;s compress middleware</li>
-<li>Configurable idle, read, and write timeouts</li>
-<li>Zero-allocation routing with Fiber&rsquo;s radix tree</li>
-<li>Automatic response pooling</li>
+<li>✅ Personalized recommendations (exclude previously seen or irrelevant items)</li>
+<li>✅ Bias reduction in search results (downweight unwanted clusters)</li>
+<li>✅ More diverse results by actively discouraging over-represented embeddings</li>
 </ul>
-<h4 id="observability-built-in">🔍 Observability Built-in<a class="headerlink" href="#observability-built-in" title="Permanent link">#</a></h4>
+<h2 id="the-future-of-hybrid-search-is-here">The Future of Hybrid Search is Here<a class="headerlink" href="#the-future-of-hybrid-search-is-here" title="Permanent link">#</a></h2>
+<p>Quiver isn&rsquo;t just another vector database. It&rsquo;s a fundamental rethink of what&rsquo;s possible when you combine fast similarity search, real SQL filtering, and zero-copy data movement into a single, high-performance system.</p>
+<p>Instead of forcing trade-offs between speed and flexibility, Quiver embraces both, enabling hybrid search that feels natural and runs at scale.</p>
+<p>We built Quiver because we saw an opportunity to do things differently — to eliminate bottlenecks, remove complexity, and provide a vector-native database that integrates seamlessly into modern AI and analytics stacks.</p>
+<p>And this is just the beginning.</p>
+<h2 id="get-involved">Get Involved<a class="headerlink" href="#get-involved" title="Permanent link">#</a></h2>
+<p>Quiver is open source. That means you can:</p>
 <ul>
-<li>Structured logging with Uber&rsquo;s Zap logger</li>
-<li>Built-in Fiber monitoring middleware</li>
-<li>Kubernetes-ready health probes</li>
-<li>Detailed request tracing</li>
+<li>✅ Try it today → Get started with a few lines of Go.</li>
+<li>✅ Contribute → Help shape the future of hybrid vector search.</li>
+<li>✅ Join the discussion → We&rsquo;re building this in the open, and we want your feedback.</li>
 </ul>
-<h4 id="developer-experience">🎯 Developer Experience<a class="headerlink" href="#developer-experience" title="Permanent link">#</a></h4>
-<ul>
-<li>Express-style middleware chain</li>
-<li>Type-safe request handling</li>
-<li>Content negotiation out of the box</li>
-<li>Flexible configuration</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="c1">// Production middleware stack</span>
-<span class="nx">app</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span>
-<span class="w">    </span><span class="nx">IdleTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">ReadTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">WriteTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
-<span class="p">})</span>
-
-<span class="c1">// Middleware chain</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">recover</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">     </span><span class="c1">// Auto-recover from panics</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">compress</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">    </span><span class="c1">// Gzip compression</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">monitor</span><span class="p">.</span><span class="nx">New</span><span class="p">())</span><span class="w">     </span><span class="c1">// Performance metrics</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">customLogger</span><span class="p">(</span><span class="nx">log</span><span class="p">))</span><span class="w"> </span><span class="c1">// Structured logging</span>
-
-<span class="c1">// Type-safe error handling</span>
-<span class="kd">func</span><span class="w"> </span><span class="nx">customErrorHandler</span><span class="p">(</span><span class="nx">log</span><span class="w"> </span><span class="o">*</span><span class="nx">zap</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nx">code</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">fiber</span><span class="p">.</span><span class="nx">StatusInternalServerError</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="nx">e</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">err</span><span class="p">.(</span><span class="o">*</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Error</span><span class="p">);</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nx">code</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">Code</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="nx">log</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="s">&quot;Request failed&quot;</span><span class="p">,</span><span class="w"> </span>
-<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">String</span><span class="p">(</span><span class="s">&quot;path&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nx">Path</span><span class="p">()),</span>
-<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Int</span><span class="p">(</span><span class="s">&quot;status&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">code</span><span class="p">),</span>
-<span class="w">            </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">),</span>
-<span class="w">        </span><span class="p">)</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">c</span><span class="p">.</span><span class="nx">Status</span><span class="p">(</span><span class="nx">code</span><span class="p">).</span><span class="nx">JSON</span><span class="p">(</span><span class="nx">fiber</span><span class="p">.</span><span class="nx">Map</span><span class="p">{</span>
-<span class="w">            </span><span class="s">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">            </span><span class="s">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">Error</span><span class="p">(),</span>
-<span class="w">        </span><span class="p">})</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">#</a></h3>
-<p>Built with <a href="https://github.com/spf13/cobra">Cobra</a> and <a href="https://github.com/spf13/viper">Viper</a>, Quiver&rsquo;s CLI provides a robust, production-grade command interface with features you&rsquo;d expect from enterprise tools.</p>
-<h4 id="command-structure">🎮 Command Structure<a class="headerlink" href="#command-structure" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code>quiver
-├──<span class="w"> </span>serve<span class="w">     </span><span class="c1"># Start the Quiver server</span>
-├──<span class="w"> </span>status<span class="w">    </span><span class="c1"># Check server health</span>
-├──<span class="w"> </span>backup<span class="w">    </span><span class="c1"># Backup index and metadata</span>
-└──<span class="w"> </span>restore<span class="w">   </span><span class="c1"># Restore from backup</span>
-</code></pre></div>
-<h4 id="flexible-configuration">⚙️ Flexible Configuration<a class="headerlink" href="#flexible-configuration" title="Permanent link">#</a></h4>
-<ul>
-<li>YAML configuration with sensible defaults</li>
-<li>Environment variable support (<code>QUIVER_*</code>)</li>
-<li>Command-line flag overrides</li>
-<li>Automatic config discovery</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="c1"># config.yaml</span>
-<span class="nt">server</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
-<span class="nt">index</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">dimension</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
-<span class="w">  </span><span class="nt">storage_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;quiver.db&quot;</span>
-<span class="w">  </span><span class="nt">max_elements</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100000</span>
-<span class="w">  </span><span class="nt">hnsw_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="w">  </span><span class="nt">ef_construction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
-<span class="w">  </span><span class="nt">ef_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
-</code></pre></div>
-<h4 id="production-features">🛡️ Production Features<a class="headerlink" href="#production-features" title="Permanent link">#</a></h4>
-<ul>
-<li>Graceful shutdown handling</li>
-<li>Structured logging with Zap</li>
-<li>Health check commands</li>
-<li>Backup and restore capabilities</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="c1">// Production-grade server lifecycle</span>
-<span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">signal</span><span class="p">.</span><span class="nx">NotifyContext</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">(),</span><span class="w"> </span>
-<span class="w">    </span><span class="nx">os</span><span class="p">.</span><span class="nx">Interrupt</span><span class="p">,</span><span class="w"> </span><span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGTERM</span><span class="p">)</span>
-<span class="k">defer</span><span class="w"> </span><span class="nx">stop</span><span class="p">()</span>
-
-<span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
-<span class="w">    </span><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">(</span><span class="s">&quot;Shutdown signal received&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">server</span><span class="p">.</span><span class="nx">Shutdown</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">());</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nx">logger</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="s">&quot;Server shutdown error&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">zap</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}()</span>
-</code></pre></div>
-<h4 id="smart-defaults">🔧 Smart Defaults<a class="headerlink" href="#smart-defaults" title="Permanent link">#</a></h4>
-<ul>
-<li>Automatic index configuration</li>
-<li>Environment-aware settings</li>
-<li>Intelligent error handling</li>
-<li>Clear, actionable error messages</li>
-</ul>
-<p>Whether you&rsquo;re running in development or production, the CLI provides a consistent, reliable interface for managing your Quiver instance.</p>
-<h3 id="core-implementation">Core Implementation<a class="headerlink" href="#core-implementation" title="Permanent link">#</a></h3>
-<p>At its heart, Quiver combines blazing-fast HNSW indexing with structured metadata storage, optimized for single-node performance.</p>
-<h4 id="vector-search-engine">🔍 Vector Search Engine<a class="headerlink" href="#vector-search-engine" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">Index</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">hnsw</span><span class="w">     </span><span class="o">*</span><span class="nx">hnswgo</span><span class="p">.</span><span class="nx">HnswIndex</span><span class="w">    </span><span class="c1">// HNSW for vector search</span>
-<span class="w">    </span><span class="nx">metadata</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">uint64</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span><span class="w"> </span><span class="c1">// Fast metadata access</span>
-<span class="w">    </span><span class="nx">db</span><span class="o">*</span><span class="nx">sql</span><span class="p">.</span><span class="nx">DB</span><span class="w">              </span><span class="c1">// DuckDB for structured queries</span>
-<span class="w">    </span><span class="nx">cache</span><span class="w">    </span><span class="nx">sync</span><span class="p">.</span><span class="nx">Map</span><span class="w">             </span><span class="c1">// High-performance metadata cache</span>
-<span class="p">}</span>
-</code></pre></div>
-<ul>
-<li><strong>HNSW Implementation</strong>: Optimized C++ core with Go bindings</li>
-<li><strong>Dual Distance Metrics</strong>: Cosine similarity and L2 (Euclidean)</li>
-<li><strong>Tunable Parameters</strong>: M, efConstruction, efSearch for performance vs accuracy</li>
-<li><strong>Memory-Mapped</strong>: Efficient handling of large vector sets</li>
-</ul>
-<h4 id="performance-optimizations">⚡ Performance Optimizations<a class="headerlink" href="#performance-optimizations" title="Permanent link">#</a></h4>
-<ul>
-<li><strong>Batch Processing</strong></li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// Automatic batching for high-throughput ingestion</span>
-<span class="w">  </span><span class="nx">batchBuffer</span><span class="w"> </span><span class="p">[]</span><span class="nx">vectorMeta</span>
-<span class="w">  </span><span class="nx">batchTicker</span><span class="w"> </span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Ticker</span>
-</code></pre></div>
-<ul>
-<li>Background vector batching</li>
-<li>Configurable flush intervals</li>
-<li>
-<p>Automatic batch size tuning</p>
-</li>
-<li>
-<p><strong>Smart Caching</strong></p>
-</li>
-<li>Two-tier metadata caching</li>
-<li>In-memory fast path</li>
-<li>DuckDB persistent storage</li>
-</ul>
-<h4 id="arrow-integration">🏹 Arrow Integration<a class="headerlink" href="#arrow-integration" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1">// Native Arrow support for efficient data loading</span>
-<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">AppendFromArrow</span><span class="p">(</span><span class="nx">rec</span><span class="w"> </span><span class="nx">arrow</span><span class="p">.</span><span class="nx">Record</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// Direct zero-copy ingestion from Arrow</span>
-<span class="w">    </span><span class="c1">// Optimized batch processing</span>
-<span class="w">    </span><span class="c1">// Type-safe schema validation</span>
-<span class="p">}</span>
-</code></pre></div>
-<h4 id="storage-engine">💾 Storage Engine<a class="headerlink" href="#storage-engine" title="Permanent link">#</a></h4>
-<ul>
-<li><strong>DuckDB Backend</strong></li>
-<li>SQL-powered metadata filtering</li>
-<li>ACID transactions</li>
-<li>JSON metadata support</li>
-<li>
-<p>Efficient hybrid search</p>
-</li>
-<li>
-<p><strong>Persistence Layer</strong></p>
-</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// Efficient save/load operations</span>
-<span class="w">  </span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">idx</span><span class="w"> </span><span class="o">*</span><span class="nx">Index</span><span class="p">)</span><span class="w"> </span><span class="nx">Save</span><span class="p">(</span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="c1">// Memory-mapped index persistence</span>
-<span class="w">      </span><span class="c1">// Atomic metadata updates</span>
-<span class="w">      </span><span class="c1">// Crash-safe operations</span>
-<span class="w">  </span><span class="p">}</span>
-</code></pre></div>
-<h4 id="production-safeguards">🛡️ Production Safeguards<a class="headerlink" href="#production-safeguards" title="Permanent link">#</a></h4>
-<ul>
-<li><strong>Resource Management</strong></li>
-<li>Graceful shutdown handling</li>
-<li>Connection pooling</li>
-<li>Memory-aware batching</li>
-<li>
-<p>Automatic cleanup</p>
-</li>
-<li>
-<p><strong>Type Safety</strong></p>
-</li>
-<li>Strict dimension validation</li>
-<li>Schema enforcement</li>
-<li>Error handling with context</li>
-</ul>
-<p>Whether you&rsquo;re processing millions of vectors or running complex hybrid queries, Quiver&rsquo;s core is optimized for your workload—right on your machine.</p>
 
 
 
@@ -1116,7 +1060,7 @@ Whether you&rsquo;re running on a laptop, embedding in an app, or scaling in pro
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 27, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 7, 2025</span>
   </span>
 
     
