@@ -12,13 +12,13 @@
         <meta name="author" content="Thomas F McGeehan V">
       
       
-        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/billion/">
+        <link rel="canonical" href="https://tfmv.github.io/blog/blog-posts/zero-copy-zero-delay/">
       
       
-        <link rel="prev" href="../flight/">
+        <link rel="prev" href="../fs-hacker/">
       
       
-        <link rel="next" href="../blink/">
+        <link rel="next" href="../high-performance-data-engineering/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Billion - Blog - Thomas F McGeehan V</title>
+        <title>Zero-Copy, Zero-Delay - Blog - Thomas F McGeehan V</title>
       
     
     
@@ -71,11 +71,11 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Billion - Blog - Thomas F McGeehan V" >
+        <meta  property="og:title"  content="Zero-Copy, Zero-Delay - Blog - Thomas F McGeehan V" >
       
         <meta  property="og:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/billion.png" >
+        <meta  property="og:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/zero-copy-zero-delay.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -83,15 +83,15 @@
       
         <meta  property="og:image:height"  content="630" >
       
-        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/billion/" >
+        <meta  property="og:url"  content="https://tfmv.github.io/blog/blog-posts/zero-copy-zero-delay/" >
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Billion - Blog - Thomas F McGeehan V" >
+        <meta  name="twitter:title"  content="Zero-Copy, Zero-Delay - Blog - Thomas F McGeehan V" >
       
         <meta  name="twitter:description"  content="Personal blog by Thomas F McGeehan V" >
       
-        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/billion.png" >
+        <meta  name="twitter:image"  content="https://tfmv.github.io/blog/assets/images/social/blog-posts/zero-copy-zero-delay.png" >
       
     
     
@@ -114,7 +114,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-billion-row-challenge" class="md-skip">
+        <a href="#zero-copy-zero-delay" class="md-skip">
           Skip to content
         </a>
       
@@ -148,7 +148,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Billion
+              Zero-Copy, Zero-Delay
             
           </span>
         </div>
@@ -479,19 +479,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../billion/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -501,7 +492,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -687,10 +677,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../zero-copy-zero-delay/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -700,6 +699,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -793,104 +793,63 @@
   
 
 
-<h1 id="the-billion-row-challenge">The Billion Row Challenge<a class="headerlink" href="#the-billion-row-challenge" title="Permanent link">#</a></h1>
-<h2 id="a-fun-exercise-in-speed">A Fun Exercise in Speed<a class="headerlink" href="#a-fun-exercise-in-speed" title="Permanent link">#</a></h2>
-<p>I came across the Billion Row Challenge the other day. Sounded fun. Take a massive dataset, process it as fast as possible, and see how well you can optimize your approach. Right up my alley.</p>
-<p>The challenge itself is simple:</p>
-<p>You get a file full of billions of weather station measurements, formatted as <code>station_name;temperature_value</code>.</p>
-<p>The goal? Compute the min, mean, and max temperature for each station as fast as possible.</p>
-<p>Seems straightforward, right? It never is.</p>
-<h2 id="the-first-attempt-the-just-get-it-working-version">The First Attempt: The &ldquo;Just Get It Working&rdquo; Version<a class="headerlink" href="#the-first-attempt-the-just-get-it-working-version" title="Permanent link">#</a></h2>
-<p>The naive approach is always the same:</p>
+<h1 id="zero-copy-zero-delay">Zero-Copy, Zero-Delay<a class="headerlink" href="#zero-copy-zero-delay" title="Permanent link">#</a></h1>
+<h2 id="scaling-data-pipelines-with-temporal-arrow-flight">Scaling Data Pipelines with Temporal &amp; Arrow Flight<a class="headerlink" href="#scaling-data-pipelines-with-temporal-arrow-flight" title="Permanent link">#</a></h2>
+<p>I believe, deeply, that if we can make data movement instantaneous, we change the world.</p>
+<p>Data moves. Workflows crash. Scaling stalls out.</p>
+<p>We needed a better way; a way to move data without moving it.</p>
+<p>By combining Temporal for orchestration and Apache Arrow Flight for high-speed data transfer, we built a pipeline that skips the usual slowdowns. No bloated serialization. No wasteful copies. Just raw, zero-copy data movement forged for the real fight.</p>
+<p>Let&rsquo;s dive in.</p>
+<h2 id="temporal-in-60-seconds">Temporal in 60 Seconds<a class="headerlink" href="#temporal-in-60-seconds" title="Permanent link">#</a></h2>
+<p>Temporal is a workflow orchestration engine that solves the hardest parts of distributed systems — durability, visibility, reliability, and scalability.</p>
+<p>Think of Temporal as an operating system for your distributed applications. You write code that describes what should happen, and Temporal ensures it does — even when things go wrong. No more brittle state machines. No more manual retries. No more losing track of execution when services fail.</p>
+<p>And you&rsquo;re not locked into a single language. Temporal supports multiple languages, including Go, Java, TypeScript, and Python, so teams can build workflows using the stack that fits them best.</p>
+<p>The magic? Temporal persists the complete state of your workflow, allowing it to resume exactly where it left off after any failure. This makes building resilient distributed applications dramatically simpler — and removes the hidden complexity that derails scalability.</p>
+<h2 id="apache-arrow-flight-in-60-seconds">Apache Arrow Flight in 60 Seconds<a class="headerlink" href="#apache-arrow-flight-in-60-seconds" title="Permanent link">#</a></h2>
+<p>Apache Arrow Flight is a high-performance framework designed to solve the hardest parts of large-scale data transfer — latency, serialization overhead, and inefficient data movement.</p>
+<p>Think of Arrow Flight as a direct pipeline for data-intensive applications. Instead of forcing data through slow, repetitive serialization steps, Flight moves it exactly as it exists in memory — zero-copy, columnar, and ready for compute.</p>
+<p>The result? Transfers that are 5–10x faster than conventional approaches, with dramatically lower memory usage and CPU overhead.</p>
+<p>And like Temporal, Arrow Flight isn&rsquo;t locked to a single stack — it integrates seamlessly with multiple languages and frameworks.</p>
+<p>If you&rsquo;re processing massive datasets with traditional serialization methods, you&rsquo;re leaving performance on the table.</p>
+<blockquote>
+<p>If you&rsquo;re processing massive datasets with traditional serialization methods, you&rsquo;re leaving performance on the table.</p>
+</blockquote>
+<h2 id="the-power-of-integration">The Power of Integration<a class="headerlink" href="#the-power-of-integration" title="Permanent link">#</a></h2>
+<p>Temporal excels at orchestrating workflows across distributed systems — managing retries, state, and visibility with ease. But in many data pipelines, large payloads moving between activities become the bottleneck. Serialization overhead creates drag, payload limits introduce constraints, and performance crumbles under the weight of outdated transfer methods.</p>
+<p>That&rsquo;s where Apache Arrow Flight takes over. No JSON. No Protobuf. No Avro. Just raw, zero-copy data movement at high speed.</p>
+<p>Temporal keeps workflows running smoothly.</p>
+<p>Arrow Flight keeps data moving without friction.</p>
+<p>One manages orchestration. The other eliminates transfer inefficiencies. No bottlenecks. No wasted cycles. Pure speed.</p>
+<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">#</a></h2>
+<p>Here&rsquo;s how it all fits together:</p>
+<h3 id="flight-orchestration">Flight Orchestration<a class="headerlink" href="#flight-orchestration" title="Permanent link">#</a></h3>
+<p><img alt="Flight Orchestration Diagram" src="../../art/temporal.png" /></p>
+<h4 id="why-this-approach-is-special">Why This Approach is Special<a class="headerlink" href="#why-this-approach-is-special" title="Permanent link">#</a></h4>
+<p>Here&rsquo;s why this approach stands out:</p>
 <ol>
-<li>Read the file line by line.</li>
-<li>Split each line at the semicolon.</li>
-<li>Parse the temperature.</li>
-<li>Store the results in a map.</li>
-<li>Print out the min, mean, and max for each station.</li>
+<li>
+<p><strong>Memory-Efficient Orchestration</strong>: Traditional data pipelines often suffer from the &ldquo;double serialization problem&rdquo; - data is serialized once to pass between services and again to store workflow state. Our approach eliminates this by keeping large data payloads outside the workflow state, passing only lightweight references through Temporal.</p>
+</li>
+<li>
+<p><strong>Zero-Copy Data Movement</strong>: Unlike conventional approaches that require multiple data copies during transfers, Arrow Flight maintains data in its columnar format throughout the entire pipeline. This means data moves between activities without the overhead of serialization/deserialization cycles, dramatically reducing CPU usage and memory pressure.</p>
+</li>
+<li>
+<p><strong>Decoupled Scaling</strong>: By separating orchestration concerns (handled by Temporal) from data movement concerns (handled by Arrow Flight), each component can scale independently according to its specific bottlenecks. Need more compute? Scale your workers. Need faster data transfer? Scale your Flight servers.</p>
+</li>
+<li>
+<p><strong>Resilience Without Compromise</strong>: Temporal provides bulletproof workflow durability and retry semantics, while Arrow Flight ensures data integrity during transfers. This combination delivers enterprise-grade reliability without sacrificing performance - something previously thought impossible in high-throughput data systems.</p>
+</li>
+<li>
+<p><strong>Vectorized Processing</strong>: Because data remains in Arrow&rsquo;s columnar format throughout the pipeline, activities can leverage modern CPU architectures through SIMD (Single Instruction, Multiple Data) operations. This enables near-hardware-speed processing that traditional row-based approaches simply cannot match.</p>
+</li>
+<li>
+<p><strong>Language Agnostic</strong>: Both Temporal and Arrow Flight support multiple programming languages, allowing teams to build polyglot data pipelines where each component uses the most appropriate language for its task - Go for orchestration, Python for ML processing, Java for integration with existing systems, etc.</p>
+</li>
 </ol>
-<p>I wrote a basic Go program to do exactly that. It worked. It also took forever.</p>
-<p>Reading a massive text file line by line? Slow. Parsing strings with <code>strings.Split</code>? Slow. Allocating memory every time a new station appears? Very slow.</p>
-<p>Clearly, I needed something better.</p>
-<h2 id="v1-first-round-of-optimizations">V1: First Round of Optimizations<a class="headerlink" href="#v1-first-round-of-optimizations" title="Permanent link">#</a></h2>
-<p>At this point, I knew I had to rethink the whole approach. Here&rsquo;s what I ended up doing:</p>
-<h3 id="1-memory-mapping-the-file">1. Memory Mapping the File<a class="headerlink" href="#1-memory-mapping-the-file" title="Permanent link">#</a></h3>
-<p>Instead of reading line by line, I used mmap (memory-mapped files) to treat the file as if it were already loaded in memory. This avoids expensive system calls and allows for ultra-fast access to data.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">reader</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">mmap</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
-</code></pre></div>
-<p>This alone gave a huge speed boost.</p>
-<h3 id="2-parallel-processing">2. Parallel Processing<a class="headerlink" href="#2-parallel-processing" title="Permanent link">#</a></h3>
-<p>Go has goroutines. I planned to use them.</p>
-<ul>
-<li>Split the file into chunks.</li>
-<li>Process each chunk in a separate worker.</li>
-<li>Aggregate the results at the end.</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="nx">numCPU</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">NumCPU</span><span class="p">()</span>
-<span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="p">&lt;</span><span class="w"> </span><span class="nx">numCPU</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">workerWg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="w">    </span><span class="k">go</span><span class="w"> </span><span class="nx">Worker</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">jobs</span><span class="p">,</span><span class="w"> </span><span class="nx">results</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">workerWg</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>Each worker handled a chunk of data and sent its results back through a channel. This meant I could fully utilize my CPU cores instead of waiting around for I/O.</p>
-<h3 id="3-custom-hash-table-for-fast-lookups">3. Custom Hash Table for Fast Lookups<a class="headerlink" href="#3-custom-hash-table-for-fast-lookups" title="Permanent link">#</a></h3>
-<p>Instead of using Go&rsquo;s built-in <code>map[string]Stats</code>, I wrote a custom hash table using open addressing with linear probing. This reduced memory overhead and improved lookup speed when updating station statistics.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">capacity</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">nextPowerOfTwo</span><span class="p">(</span><span class="nx">expectedStations</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">keys</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="nx">StationStats</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-<span class="nx">m</span><span class="p">.</span><span class="nx">occupied</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="nx">capacity</span><span class="p">)</span>
-</code></pre></div>
-<p>Every lookup or insert happened in constant time.</p>
-<h3 id="4-zero-allocation-string-parsing">4. Zero-Allocation String Parsing<a class="headerlink" href="#4-zero-allocation-string-parsing" title="Permanent link">#</a></h3>
-<p>Go&rsquo;s default string parsing methods allocate memory like there&rsquo;s no tomorrow. Instead of using <code>strings.Split</code>, I manually found the separator and used unsafe string conversions to avoid unnecessary allocations.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sepIdx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">bytes</span><span class="p">.</span><span class="nx">IndexByte</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;;&#39;</span><span class="p">)</span>
-<span class="nx">station</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">UnsafeString</span><span class="p">(</span><span class="nx">line</span><span class="p">[:</span><span class="nx">sepIdx</span><span class="p">])</span>
-<span class="nx">measurement</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">ParseFloat</span><span class="p">(</span><span class="nx">line</span><span class="p">[</span><span class="nx">sepIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-</code></pre></div>
-<p>No extra allocations. No garbage collection overhead.</p>
-<h2 id="v1-results-getting-closer">V1 Results: Getting Closer<a class="headerlink" href="#v1-results-getting-closer" title="Permanent link">#</a></h2>
-<p>After these optimizations, I got the processing time down to about 14.79 seconds for a billion rows. Not bad, but I knew we could do better.</p>
-<h2 id="v2-breaking-the-speed-barrier">V2: Breaking the Speed Barrier<a class="headerlink" href="#v2-breaking-the-speed-barrier" title="Permanent link">#</a></h2>
-<p>The journey to sub-4-second processing required even more aggressive optimizations:</p>
-<h3 id="1-integer-based-temperature-storage">1. Integer-Based Temperature Storage<a class="headerlink" href="#1-integer-based-temperature-storage" title="Permanent link">#</a></h3>
-<p>Instead of using floats, we store temperatures as int16 with an implied decimal point. This not only saves memory but also makes calculations much faster.</p>
-<h3 id="2-fixed-size-buffers">2. Fixed-Size Buffers<a class="headerlink" href="#2-fixed-size-buffers" title="Permanent link">#</a></h3>
-<p>We pre-allocate fixed-size buffers for station names, eliminating dynamic allocations during processing:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">stationName</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">hashVal</span><span class="w"> </span><span class="kt">uint32</span>
-<span class="w">    </span><span class="nx">byteLen</span><span class="w"> </span><span class="kt">int</span>
-<span class="w">    </span><span class="nx">name</span><span class="w">    </span><span class="p">[</span><span class="nx">MaxLineLength</span><span class="p">]</span><span class="kt">byte</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="3-larger-batch-sizes">3. Larger Batch Sizes<a class="headerlink" href="#3-larger-batch-sizes" title="Permanent link">#</a></h3>
-<p>We increased the batch size to 256MB, which significantly improved I/O throughput:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">BatchSizeBytes</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">256</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="c1">// 256 MB</span>
-</code></pre></div>
-<h3 id="4-branchless-temperature-parsing">4. Branchless Temperature Parsing<a class="headerlink" href="#4-branchless-temperature-parsing" title="Permanent link">#</a></h3>
-<p>We rewrote the temperature parsing to be as branchless as possible, making it more CPU-cache friendly.</p>
-<h3 id="5-lock-free-processing">5. Lock-Free Processing<a class="headerlink" href="#5-lock-free-processing" title="Permanent link">#</a></h3>
-<p>By carefully designing our data structures, we eliminated the need for locks in our parallel processing pipeline.</p>
-<h2 id="the-final-results-breaking-records">The Final Results: Breaking Records<a class="headerlink" href="#the-final-results-breaking-records" title="Permanent link">#</a></h2>
-<p>The V2 implementation achieved something remarkable:</p>
-<div class="highlight"><pre><span></span><code><span class="o">===</span><span class="w"> </span>Benchmark<span class="w"> </span><span class="nv">Summary</span><span class="w"> </span><span class="o">===</span>
-Total<span class="w"> </span>Processing<span class="w"> </span>Time:<span class="w"> </span><span class="m">3</span>.35<span class="w"> </span>seconds
-Throughput:<span class="w"> </span><span class="m">298</span>.16<span class="w"> </span>million<span class="w"> </span>rows/second
-Memory<span class="w"> </span>Used:<span class="w"> </span><span class="m">516</span>.91<span class="w"> </span>MB
-Number<span class="w"> </span>of<span class="w"> </span>CPUs:<span class="w"> </span><span class="m">10</span>
-Batch<span class="w"> </span>Size:<span class="w"> </span><span class="m">256</span><span class="w"> </span><span class="nv">MB</span>
-<span class="o">=====================</span>
-</code></pre></div>
-<p><strong>3.35 seconds for a billion rows.</strong> That&rsquo;s a 77% improvement over V1!</p>
-<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">#</a></h2>
-<ol>
-<li><strong>Memory efficiency is king.</strong> Fixed-size buffers and integer math made a huge difference.</li>
-<li><strong>Batch size matters.</strong> Larger batches meant better I/O throughput.</li>
-<li><strong>Avoid branches.</strong> CPU branch prediction is expensive; eliminate branches where possible.</li>
-<li><strong>Know your hardware.</strong> Understanding CPU cache lines and memory alignment paid off.</li>
-<li><strong>Sometimes unsafe is necessary.</strong> Strategic use of unsafe operations can yield significant performance gains.</li>
-<li><strong>Measure, don&rsquo;t guess.</strong> Every optimization was validated with benchmarks.</li>
-</ol>
-<p>The journey from 14.79 seconds to 3.35 seconds shows that there&rsquo;s always room for optimization when you&rsquo;re willing to dig deep enough into the problem. It&rsquo;s not just about writing faster code—it&rsquo;s about understanding the entire stack, from the hardware up.</p>
+<p>The result is not just an incremental improvement on existing patterns — it’s a fundamental reimagining of how data should flow through distributed systems. By allowing Temporal to focus on orchestration and leveraging Apache Arrow Flight for high-performance data movement, we’ve built a system capable of handling orders of magnitude more data with significantly less infrastructure.</p>
+<p>At the core of this architecture, a Temporal Server orchestrates workflows, delegating tasks to Activity Workers, each responsible for a specific stage of the pipeline. Meanwhile, the Arrow Flight Server acts as a high-speed intermediary, enabling workers to push, retrieve, and process data without bottlenecks. Thanks to Apache Arrow’s columnar format, data moves seamlessly through the pipeline with zero-copy transfers and vectorized execution, ensuring maximum efficiency. Processed data is either persisted or automatically cleaned up based on TTL policies.</p>
+<p>Instead of dragging massive payloads through the workflow, we pass only lightweight batch IDs. Rather than burdening Temporal with raw data, each activity simply references a stored batch, retrieving it only when needed. This approach keeps Temporal lean, Arrow Flight fast, and data movement frictionless — a trifecta of efficiency that enables truly scalable, high-performance pipelines.</p>
+<p>Ready for takeoff? Explore the repo <a href="https://github.com/TFMV/temporal">here</a>.</p>
 
 
 
@@ -911,7 +870,7 @@ Batch<span class="w"> </span>Size:<span class="w"> </span><span class="m">256</s
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 2, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 20, 2025</span>
   </span>
 
     

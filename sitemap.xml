@@ -2,54 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://tfmv.github.io/blog/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/arrow-ecosystem-intro/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/arrow-ecosystem/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/billion/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/blink/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tfmv.github.io/blog/blog-posts/flight-prototype/</loc>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/flight/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/fs-hacker/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/go-arrow/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tfmv.github.io/blog/blog-posts/high-performance-data-engineering/</loc>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/pygomo/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/quiver/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/rust-vs-go/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/time-machine/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
     </url>
     <url>
          <loc>https://tfmv.github.io/blog/blog-posts/unilateral-bond/</loc>
-         <lastmod>2025-03-11</lastmod>
+         <lastmod>2025-03-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tfmv.github.io/blog/blog-posts/zero-copy-zero-delay/</loc>
+         <lastmod>2025-03-20</lastmod>
     </url>
 </urlset>
