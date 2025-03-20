@@ -43,6 +43,9 @@ nav:
       - Rust vs Go: blog-posts/rust-vs-go.md
       - The Unilateral Bond: blog-posts/unilateral-bond.md
       - Walking the Filesystem like a Hacker: blog-posts/fs-hacker.md
+      - Zero-Copy, Zero-Delay: blog-posts/zero-copy-zero-delay.md
+      - High Performance Data Engineering: blog-posts/high-performance-data-engineering.md
+      - Flight Prototype: blog-posts/flight-prototype.md
 
 plugins:
   - search

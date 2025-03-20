@@ -14,7 +14,7 @@ And sometimes, I just write poetry.
 
 ## 📌 Latest Posts  
 
-### [Living Databases](blog-posts/time-machine.md)
+### [Zero-Copy, Zero-Delay](blog-posts/zero-copy-zero-delay.md)
 
 The most powerful database feature isn’t speed or scale; it’s the ability to revise history.
 
